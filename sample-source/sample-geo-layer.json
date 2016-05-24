@@ -1,0 +1,81 @@
+{
+	"layers": [
+    {
+		"id": "geojson",
+		"title": "GeoJSON",
+		"zIndex": 10,
+		"visible": true,
+		"opacity": 1,
+		"source":
+        {
+            "type": "GeoJSON",
+            "options":{
+                "json": {
+                    "type": "FeatureCollection",
+                    "crs": {
+                      "type": "name",
+                      "properties": {
+                         "name": "EPSG:4326"
+                      }
+                   },
+                    "features": [{
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                              [
+                                [
+                                  -109.1162109375,
+                                  36.98500309285596
+                                ],
+                                [
+                                  -109.1162109375,
+                                  41.0130657870063
+                                ],
+                                [
+                                  -101.9970703125,
+                                  41.0130657870063
+                                ],
+                                [
+                                  -101.9970703125,
+                                  36.98500309285596
+                                ],
+                                [
+                                  -109.1162109375,
+                                  36.98500309285596
+                                ]
+                              ]
+                            ]
+                          }
+                    }]
+                } 
+            }
+        }
+		
+	}, {
+		"id": "osm",
+		"title": "Open Street Map",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "OSM",
+			"options": {}
+		}
+	}, {
+		"id": "mapquest",
+		"title": "MapQuest",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "MapQuest",
+			"options": {
+				"layer": "sat"
+			}
+		}
+	}
+    ],
+	"extent": [-179.89999996667328, -85.05999999689446, 179.89999996667328, 85.05999999689448]
+}

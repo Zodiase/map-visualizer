@@ -1,0 +1,33 @@
+{
+	"layers": [{
+		"id": "tilewms",
+		"title": "Tile WMS",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "TileWMS",
+			"options": {
+				"url": "http://demo.boundlessgeo.com/geoserver/wms",
+				"params": {
+					"LAYERS": "topp:states",
+					"TILED": true
+				},
+				"serverType": "geoserver"
+			}
+		}
+	}, {
+		"id": "mapquest",
+		"title": "MapQuest",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "MapQuest",
+			"options": {
+				"layer": "sat"
+			}
+		}
+	}],
+    "extent": [-179.89999996667328, -85.05999999689446, 179.89999996667328, 85.05999999689448]
+}

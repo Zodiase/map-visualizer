@@ -1,0 +1,29 @@
+{
+    "layers": [
+        {
+            "id": "osm",
+            "title": "Open Street Map",
+            "zIndex": 0,
+            "visible": true,
+            "opacity": 0.1,
+            "source": {
+                "type": "OSM",
+                "options": {}
+            }
+        },
+        {
+            "id": "mapquest",
+            "title": "MapQuest",
+            "zIndex": 0,
+            "visible": true,
+            "opacity": 0.1,
+            "source": {
+                "type": "MapQuest",
+                "options": {
+                    "layer": "sat"
+                }
+            }
+        }
+    ],
+    "extent": [-20026376.39, -20048966.10, 20026376.39, 20048966.10]
+}

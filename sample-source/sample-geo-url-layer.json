@@ -1,0 +1,44 @@
+{
+	"layers": [
+    {
+		"id": "geojson",
+		"title": "GeoJSON",
+		"zIndex": 10,
+		"visible": true,
+		"opacity": 1,
+		"source":
+        {
+            "type": "GeoJSON",
+            "options":{
+                "jsonFile": {
+                    "url": "./sample-source/custom.geo.json"
+                }
+            }
+        }
+		
+	}, {
+		"id": "osm",
+		"title": "Open Street Map",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "OSM",
+			"options": {}
+		}
+	}, {
+		"id": "mapquest",
+		"title": "MapQuest",
+		"zIndex": 0,
+		"visible": true,
+		"opacity": 0.1,
+		"source": {
+			"type": "MapQuest",
+			"options": {
+				"layer": "sat"
+			}
+		}
+	}
+    ],
+	"extent": [-179.89999996667328, -85.05999999689446, 179.89999996667328, 85.05999999689448]
+}
