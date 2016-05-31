@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - 4.1
+before_script:
+  - "curl -O http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar"
+  - "npm install"
+  - "npm run build"
+  - "PATH='./map-visualizer/node_modules/phantomjs/bin:$PATH' java -jar selenium-server-standalone-2.53.0.jar &"
+  - sleep 3
+  - npm start &
+  - sleep 5
+script:
+  - wdio ./test/wdio.conf.js  

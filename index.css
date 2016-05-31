@@ -1,0 +1,227 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#map {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(33, 33, 33, 0.8);
+}
+
+#map > .ol-viewport .layer-list {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  overflow: visible;
+  -webkit-transition: width 200ms ease;
+  -moz-transition: width 200ms ease;
+  -ms-transition: width 200ms ease;
+  -o-transition: width 200ms ease;
+  transition: width 200ms ease;
+}
+#map > .ol-viewport.layer-list--expanded .layer-list {
+  width: 300px;
+}
+
+#map > .ol-viewport .layer-list__toggle.ol-control {
+  top: 0;
+  left: 100%;
+  margin-top: 0.5em;
+  margin-left: 0.5em;
+  -webkit-transition: margin-left 200ms ease;
+  -moz-transition: margin-left 200ms ease;
+  -ms-transition: margin-left 200ms ease;
+  -o-transition: margin-left 200ms ease;
+  transition: margin-left 200ms ease;
+}
+#map > .ol-viewport.layer-list--expanded .layer-list__toggle.ol-control {
+  margin-left: -2.5em;
+}
+
+#map > .ol-viewport .layer-list__container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  overflow: hidden;
+  background-color: white;
+  color: black;
+  
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+#map > .ol-viewport .layer-list__title {
+  display: block;
+  width: auto;
+  height: auto;
+  padding: 10px 40px;
+  border-bottom: 1px solid rgba(33, 33, 33, 0.27);
+  font-size: 24px;
+  
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: auto;
+}
+
+#map > .ol-viewport .layer-list__body {
+  padding: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#map > .ol-viewport .layer-list__item {
+  min-height: 40px;
+  font-size: 18px;
+  background-color: transparent;
+}
+#map > .ol-viewport .layer-list__item:hover {
+  background-color: rgba(33, 33, 33, 0.1);
+}
+
+#map > .ol-viewport .layer-list__item-row {
+  position: relative;
+  height: 40px;
+  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+#map > .ol-viewport .layer-list__item-row > * {
+  margin: 0 5px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#map > .ol-viewport .layer-list__item__label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#map > .ol-viewport .layer-list__item button {
+  border: 0;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  padding: 0;
+  background-color: transparent;
+  cursor: pointer;
+  outline: none;
+}
+#map > .ol-viewport .layer-list__item button:hover {
+  background-color: rgba(33, 33, 33, 0.2);
+}
+
+#map > .ol-viewport .layer-list__item:not(.layer-list__item--hidden) .layer-list__item__action-hide {
+  visibility: hidden;
+}
+#map > .ol-viewport .layer-list__item:not(.layer-list__item--hidden):hover .layer-list__item__action-hide {
+  visibility: visible;
+  color: rgba(33, 33, 33, 0.3);
+  background-color: transparent;
+}
+#map > .ol-viewport .layer-list__item.layer-list__item--hidden .layer-list__item__action-hide {
+  visibility: visible;
+}
+
+#map > .ol-viewport .layer-list__item:not(:hover) .layer-list__item__action-demote,
+#map > .ol-viewport .layer-list__item:not(:hover) .layer-list__item__action-promote {
+  display: none;
+}
+
+#map > .ol-viewport .layer-list__item-row__label {
+  font-size: 14px;
+}
+
+#map > .ol-viewport .layer-list__item-row.row-opacity .layer-list__item-row__input {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+#map > .ol-viewport .layer-list__item-row.row-opacity .layer-list__item-row__value-label {
+  font-size: 14px;
+  width: 50px;
+  text-align: center;
+}
+
+#map > .ol-viewport .layer-list__item .layer-list__item-row.row-opacity {
+  background-color: white;
+  margin-left: 20px;
+}
+
+#map > .ol-viewport .layer-list__item button.layer-list__item__action-opacity {
+  border-radius: 2px;
+}
+
+#map > .ol-viewport .layer-list__item:not(.layer-list__item--opacity-control-expanded) .layer-list__item-row.row-opacity {
+  display: none;
+}
+
+#map > .ol-viewport .layer-list__item.layer-list__item--opacity-control-expanded .layer-list__item__action-opacity {
+  opacity: 1 !important;
+  background-color: rgba(33, 33, 33, 0.1);
+  transform: translateX(0px) translateY(6px);
+}
+
+#map > .ol-viewport .layer-list__item.layer-list__item--opacity-control-expanded .layer-list__item-row.row-opacity {
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+}
+
+#map > .ol-viewport .ol-control.ol-zoom {
+  top: 3em;
+  left: 0.5em;
+}
+
+
+#notifications {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: transparent;
+  font-family: monospace;
+  color: white;
+  pointer-events: none;
+
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-align-content: center;
+  -ms-flex-line-pack: center;
+  align-content: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
