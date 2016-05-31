@@ -1,0 +1,29 @@
+- [x] basic element check
+  - [x] map
+  - [x] layer list
+- [x] buttons
+  - [x] list-list toggle
+- [ ] source loading
+  - [x] when no source file url included
+  - [ ] when url updated list should be renewed
+  - [x] when include correct source file
+  - [x] when the source included is not json format
+-[ ] config string
+  - [x] opacity
+    - [x] when opacity slier changed by user, config string need to be changed
+    - [x] when opacity in url is changed to smaller than 0 or bigger than 1 (currently, nothing happened, but would be better if notifying user the range)
+    - [x] when config string changed, layer object need to be changed
+  - [x] layer order
+    - [x] user change arrow to reorder the list
+    - [x] when user use arrows, config string need to be changed
+    - [x] when user trying to move top layer up or bottom layer down
+    - [x] when config string include the order, user should see the correct layer ordder
+  - [x] visibility
+    - [x] should not see the layer when user click hidden button
+    - [x] config string need to be changed when click hidden button
+    - [x] use should not see the layer that set to be invisible in config string
+  - [ ] extent string
+    - [x] when extent specified in url, map should follow that setting
+    - [x] when extent not set in url, map should follow seeting specified in source file
+    - [ ] when extent value is not in correct range
+    

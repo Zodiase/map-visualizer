@@ -309,6 +309,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
+      
     setHashValue({
       "config": configString
     });
@@ -347,6 +348,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
+      
     setHashValue({
       "config": configString
     });
@@ -385,6 +387,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
+      
     setHashValue({
       "config": configString
     });

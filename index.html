@@ -1,0 +1,47 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Visualize</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.15.1/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="index.css" type="text/css">
+    <script src="lib/babel-polyfill-6.9.0.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-1.12.3.min.js" type="text/javascript"></script>
+    <script src="http://openlayers.org/en/v3.15.1/build/ol.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="notifications"></div>
+    <!--<script src="https://rawgit.com/Zodiase/map-visualizer/master/src/viewer.js" type="text/javascript"></script>-->
+    <script src="./lib/viewer.js" type="text/javascript">
+    </script>
+    <!--<script type="text/javascript">
+
+        (function(){
+            'use strict';
+            console.log("get here");
+            var map = $('#map');
+            var appendDiv = function(m) {
+                m.append($('<div>'));
+                
+            };
+            appendDiv(map);
+            var mybutton = function(){
+                this.toggleButton_ = document.createElement('button');
+                this.toggleButton_.className = 'material-icons';
+                this.toggleButton_.title = 'Toggle layer list';
+                this.toggleButton_.textContent = 'layers';
+            };
+            var $button = new mybutton();
+            $('#map div').append($button.toggleButton_);
+            console.log('get here');
+        })();
+        
+
+    </script>-->
+  </body>
+</html>
