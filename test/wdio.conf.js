@@ -160,16 +160,19 @@ exports.config = {
         browser.addCommand('slide', function(button, slider) {
             browser.click(button);
             //browser.setValue(slider, 50);
-            
-            var height = browser.getElementSize('#map', 'height');
-            var width = browser.getElementSize('#map', 'width');
+            var height = browser.getElementSize(slider, 'height');
+            var width = browser.getElementSize(slider, 'width');
             //var initial_y = offset_top + height/2;
-            var initial_x = width-5;
+            var initial_x = width+20;
             var initial_y = height/2;
-            console.log(initial_x);
+            initial_x = width/2;
             browser.moveToObject(slider, initial_x, initial_y);
             browser.click(slider);
-                
+            browser.pause(1000);
+        });
+        browser.addCommand('reseturl', function(location_hash){
+           browser.url('/'); 
+           browser.url(location_hash);
         });
     },
     //
@@ -181,7 +184,6 @@ exports.config = {
     // Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
     // beforeEach in Mocha)
     beforeHook: function () {
-        
     }
     //
     // Hook that gets executed _after_ a hook within the suite starts (e.g. runs after calling
@@ -219,5 +221,4 @@ exports.config = {
     // onComplete: function(exitCode) {
     // }
 };
-
 

@@ -27,7 +27,7 @@
     "eslint": "^2.11.0",
     "express": "^4.13.4",
     "mocha": "^2.5.3",
-    "phantomjs": "^2.1.7",
+    "phantomjs-prebuilt": "^2.1.7",
     "wdio-mocha-framework": "^0.3.1",
     "webdriverio": "^4.0.9"
   }

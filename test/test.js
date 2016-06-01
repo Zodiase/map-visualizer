@@ -1,6 +1,7 @@
 describe('simple test', function(){
     before('set up url', function(){
         browser.url('/');
+
     });
     describe('Check homepage when first loaded', function(){
         
@@ -23,19 +24,11 @@ describe('simple test', function(){
             // expect(browser.getCssProperty('.layer-list', ))
             expect(browser.getCssProperty('.layer-list', 'width').value).to.equal('0px');
         });
-        it('should notifying user when no source url available', function(){ 
-            browser.log('browser');
-            browser.waitForExist('#notifications span');
-            
-            expect(browser.isExisting('#notifications span')).to.equal(true); 
-            expect(browser.getText('#notifications span:nth-Child(1)')).to.equal(''); 
-            expect(browser.getText('#notifications span:nth-Child(2)')).to.equal('No source url available.'); 
-            browser.notificationCheck('/','', 'No source url available.');
-        });
+        
         
     });
-    /*describe('should have layers button work noramally', function(){
-        
+    describe('should have layers button work noramally', function(){  
+
         var button = '.layer-list__toggle button';
         it('should have "layer" in text', function(){
             expect(browser.getText(button)).to.equal('layers');
@@ -109,13 +102,14 @@ describe('source loading', function(){
                     expect(browser.isExisting(slider)).to.equal(true);
                     browser.slide(curr_button, slider);
                 });
+
                 expect(browser.getUrl()).to.equal('http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.55_-_osm___0_1_0.55');
-                
+
+
                 
             });
             it('should have slider changed to 1 when config string set to value larger than 1 in url', function(){
-                var location_hash = '/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___1_1_2.0_-_osm___0_1_0.55';
-                browser.url(location_hash);
+                browser.reseturl('/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___1_1_2.0_-_osm___0_1_0.55');
                 var slider1 = '.layer-list__item:nth-child(1) .layer-list__item-row__input';
                 var slider2 = '.layer-list__item:nth-child(2) .layer-list__item-row__input';
                 browser.waitForExist(slider1);
@@ -153,6 +147,7 @@ describe('source loading', function(){
             });
         });
         describe('layer order test', function(){
+
             it('should change the layer order in list when user click arrow', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
                 browser.waitForExist('.layer-list__toggle button');
