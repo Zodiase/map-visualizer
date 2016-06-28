@@ -2,19 +2,6 @@ language: node_js
 node_js:
   - 4.1
 before_script:
-  - "curl -O http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar"
-  - "npm install"
-  - "npm run build"
-  - "java -jar selenium-server-standalone-2.53.0.jar -Dphantomjs.binary.path=./node_modules/phantomjs-prebuilt/bin/phantomjs &"
-  - npm start &
-  - "bash waiting-for-start.sh"
-  - "STANDALONE=$(pgrep -n -f java)"
-  - "NODE=$(pgrep -n -f node)"
-  - "NPM=$(pgrep -n -f npm)"
+  - "npm run test-setup"
 script:
-  - wdio ./test/wdio.conf.js 
-after_script:
-  - "kill $STANDALONE"
-  - "kill $NPM"
-  - "kill $NODE"
-  - "bash waiting-for-finish.sh"
+  - "npm test"
