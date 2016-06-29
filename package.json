@@ -9,6 +9,7 @@
     "lint": "eslint src/*.js",
     "lint-test": "eslint test/test.js",
     "test-setup": "bash test/setup.sh",
+    "test-host": "bash test/host.sh",
     "test": "bash test/start.sh"
   },
   "repository": {
