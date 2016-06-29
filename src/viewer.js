@@ -6,6 +6,7 @@
     "Colon": '___',
     "Comma": '_'
   };
+  const DefaultProjection = 'EPSG:4326';
 
   /**
    * @param {String} hash
@@ -177,7 +178,7 @@
           "GeoJSON": function (options) {
             if (options.json) {
               const features = (new ol.format.GeoJSON()).readFeatures(options.json);
-            
+
               return {
                 "type": "Vector",
                 "options": {
@@ -187,7 +188,7 @@
             } else if (options.jsonFile) {
               const format = new ol.format.GeoJSON();
               const url = options.jsonFile.url;
-            
+
               return {
                 "type": "Vector",
                 "options": {
@@ -201,7 +202,7 @@
           }
         },
         supportedVirtualSourceTypes = Object.keys(virtualLayerTypeMapping);
-    
+
   const $mapContainer = $('#map'),
         $notificationContainer = $('#notifications');
   if ($mapContainer.length === 0 || $notificationContainer.length === 0) {
@@ -309,7 +310,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
-      
+
     setHashValue({
       "config": configString
     });
@@ -348,7 +349,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
-      
+
     setHashValue({
       "config": configString
     });
@@ -387,7 +388,7 @@
 
     // Update hash.
     const configString = buildLayerConfigString(this.layers_);
-      
+
     setHashValue({
       "config": configString
     });
@@ -648,14 +649,62 @@
     controls: ol.control.defaults().extend([
       layerListControl
     ]),
-    view: new ol.View({
-      projection: 'EPSG:4326',
-      center: [0, 0],
-      zoom: 0
-    })
+    view: null
   });
   const mainLayerGroup = map.getLayerGroup();
   const mainLayerCollection = mainLayerGroup.getLayers();
+
+  /**
+   * A map of projection => ol.View pairs.
+   */
+  const _mapViews = {};
+  /**
+   * Get the map view object for the given projection.
+   * Throws an error if the given projection is invalid.
+   * @param {String} projName
+   * @returns {ol.View}
+   */
+  const getViewForProjection = (projName) => {
+    const projKey = String(projName).toUpperCase();
+    if (!_mapViews.hasOwnProperty(projKey)) {
+      try {
+        _mapViews[projKey] = new ol.View({
+          projection: projKey,
+          center: [0, 0],
+          zoom: 0
+        });
+      } catch (error) {
+        throw new Error(`Could not create map view for projection ${projKey}.`);
+      }
+    }
+    return _mapViews[projKey];
+  };
+  /**
+   * Update the projection of the map.
+   * If null is specified, the current map view will be unloaded.
+   * Throws an error if the given projection is invalid.
+   * @param {String|null} projName
+   */
+  const setMapProjection = (projName) => {
+    const prev_mapView = map.getView(),
+          next_mapView = (projName === null) ? null : getViewForProjection(projName);
+
+    if (prev_mapView === next_mapView) {
+      return;
+    }
+
+    if (prev_mapView !== null) {
+      prev_mapView.un('change:center', userInteractionStart);
+      prev_mapView.un('change:resolution', userInteractionStart);
+    }
+
+    map.setView(next_mapView);
+
+    if (next_mapView !== null) {
+      next_mapView.on('change:center', userInteractionStart);
+      next_mapView.on('change:resolution', userInteractionStart);
+    }
+  };
 
   // Runtime data.
   let busy = false,
@@ -719,6 +768,7 @@
       mainLayerCollection.clear();
       $notificationContainer.empty();
       layerListControl.reload([], {});
+      setMapProjection(null);
 
       $notificationContainer.append($('<span>').text(hash));
       // Source Url is necessary.
@@ -740,6 +790,8 @@
         console.info('Downloaded', data);
         $notificationContainer.empty();
         try {
+          // Load projection from source file or use default.
+          setMapProjection(data.projection || DefaultProjection);
           // Load layers.
           loadLayers.call(mainLayerCollection, data.layers);
           // Update layers.
@@ -906,8 +958,6 @@
   };
 
   map.on('moveend', userInteractionEnd);
-  map.getView().on('change:center', userInteractionStart);
-  map.getView().on('change:resolution', userInteractionStart);
   map.on('change:size', userInteractionStart);
 
   $(window).on('load', () => {
