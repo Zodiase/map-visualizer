@@ -1,0 +1,30 @@
+{
+    "layers": [
+        {
+            "id": "osm",
+            "title": "Open Street Map",
+            "zIndex": 0,
+            "visible": true,
+            "opacity": 1,
+            "source": {
+                "type": "OSM",
+                "options": {}
+            }
+        },
+        {
+            "id": "esri",
+            "title": "State City Highway",
+            "zIndex": 1,
+            "visible": true,
+            "opacity": 1,
+            "source": {
+                "type": "TileArcGISRest",
+                "options": {
+                  "url": "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Specialty/ESRI_StateCityHighway_USA/MapServer"
+                }
+            }
+        }
+    ],
+    "projection": "EPSG:3857",
+    "extent": [-14382391.242138762, 2382389.2975923754, -6946597.130556816, 6951489.100367064]
+}
