@@ -961,7 +961,6 @@
         throw new RangeError('Unsupported layer source type.');
       }
       const layerSource = new ol.source[config.source.type](config.source.options);
-      console.info('layerSource', layerSource);
       const layerType = layerTypeMapping[config.source.type];
       const layer = new ol.layer[layerType]({
         id: config.id,
@@ -972,7 +971,6 @@
         extent: config.extent,
         zIndex: config.zIndex
       });
-      console.info('layer', layer);
       this.push(layer);
     }
   };
@@ -1012,8 +1010,6 @@
     if (!loaded) {
       return;
     }
-
-    console.log('update view extent in hash', extent);
 
     // Update Hash.
     const extentString = buildExtentString(extent);
