@@ -173,7 +173,7 @@
         maxOpacity = 1.0,
         extentUpdateDelay = 200;
 
-
+  // @type {Object.<SourceType, ConvertFunction>}
   const virtualLayerTypeMapping = {
           "GeoJSON": function (options) {
             if (options.json) {
@@ -209,12 +209,14 @@
     throw new ReferenceError('Can not find elements.');
   }
 
-  // Layer List Control.
+  // Layer List Control constructor.
   const LayerListControl = function (opt_options) {
     const options = opt_options || {};
 
     // Internal data structure storing layers.
+    // @type {Array.<Object>}
     this.layers_ = [];
+    // @type {Object.<String, Object>}
     this.layerMap_ = {};
 
     // The actual button to toggle the layer list.
@@ -277,6 +279,7 @@
     });
   };
   ol.inherits(LayerListControl, ol.control.Control);
+
   LayerListControl.prototype.CssClasses_ = {
     "ListExpanded": "layer-list--expanded",
     "OpacityControlExpanded": "layer-list__item--opacity-control-expanded",
@@ -288,10 +291,30 @@
     "ItemAction_Demote": "layer-list__item__action-demote",
     "ItemAction_Opacity": "layer-list__item__action-opacity"
   };
+
+  /**
+   * Compare the order of two layers.
+   * @param {Object} a
+   * @param {Number} a.zIndex
+   * @param {Number} a.index
+   * @param {Object} b
+   * @param {Number} b.zIndex
+   * @param {Number} b.index
+   * @returns {Number}
+   */
   LayerListControl.prototype.compareLayerOrder_ = (a, b) => (a.zIndex === b.zIndex) ? (b.index - a.index) : (b.zIndex - a.zIndex);
+
+  /**
+   * Sort the list of layer records.
+   */
   LayerListControl.prototype.sortLayers_ = function () {
     this.layers_.sort(this.compareLayerOrder_);
   };
+
+  /**
+   * Handler for layer list toggles.
+   * Expands or collapses the layer list.
+   */
   LayerListControl.prototype.toggleLayerListHandler_ = function () {
     const viewportElement = this.getMap().getViewport();
     if (viewportElement.classList.contains(this.CssClasses_.ListExpanded)) {
@@ -300,6 +323,13 @@
       viewportElement.classList.add(this.CssClasses_.ListExpanded);
     }
   };
+
+  /**
+   * Handler for layer visibility toggles.
+   * Shows or hides the layer list.
+   * Updates the url hash when needed.
+   * @param {Object} event
+   */
   LayerListControl.prototype.toggleLayerVisibilityHandler_ = function (event) {
     const button = event.currentTarget;
     const rowElement = button.parentElement;
@@ -315,6 +345,13 @@
       "config": configString
     });
   };
+
+  /**
+   * Handler for layer order promotions.
+   * Moves the layer higher.
+   * Updates the url hash when needed.
+   * @param {Object} event
+   */
   LayerListControl.prototype.promoteLayerHandler_ = function (event) {
     // Find this layer.
     const button = event.currentTarget;
@@ -354,6 +391,13 @@
       "config": configString
     });
   };
+
+  /**
+   * Handler for layer order demotions.
+   * Moves the layer lower.
+   * Updates the url hash when needed.
+   * @param {Object} event
+   */
   LayerListControl.prototype.demoteLayerHandler_ = function (event) {
     // Find this layer.
     const button = event.currentTarget;
@@ -393,6 +437,12 @@
       "config": configString
     });
   };
+
+  /**
+   * Handler for layer opacity control toggles.
+   * Expands or collapses the opacity control for the layer.
+   * @param {Object} event
+   */
   LayerListControl.prototype.toggleOpacityControlHandler_ = function (event) {
     const button = event.currentTarget;
     const rowElement = button.parentElement;
@@ -403,6 +453,12 @@
       layerElement.classList.add(this.CssClasses_.OpacityControlExpanded);
     }
   };
+
+  /**
+   * Handler for layer opacity changes.
+   * Updates the url hash when needed.
+   * @param {Object} event
+   */
   LayerListControl.prototype.changeLayerOpacityHandler_ = function (event) {
     const input = event.currentTarget;
     const rowElement = input.parentElement;
@@ -429,8 +485,9 @@
       });
     }
   };
+
   /**
-   * Re-assign zIndex values to layers according to their position in list.
+   * Re-assign zIndex values to layers according to the descending order of their positions in list.
    * The result zIndex values are guaranteed to be continuous.
    */
   LayerListControl.prototype.reIndex_ = function () {
@@ -438,6 +495,7 @@
       layer.zIndex = (layers.length - 1) - index;
     });
   };
+
   /**
    * Creates an element representing a layer.
    * @param {Object} layer
@@ -511,6 +569,7 @@
 
     return itemContainer;
   };
+
   /**
    * Reload everything in the list from the provided layer configs and extra configs.
    * @param {Array.<Object>} layerConfigs
@@ -560,6 +619,7 @@
       container.appendChild(this.createLayerItemRowElement_(layer));
     });
   };
+
   /**
    * Update the list with the provided extra configs.
    * @param {Object} extraLayerConfigs
@@ -641,6 +701,8 @@
       });
     });
   };
+
+  // Instantiate map controls.
   const layerListControl = new LayerListControl();
 
   // Start map loading.
@@ -707,13 +769,42 @@
   };
 
   // Runtime data.
-  let busy = false,
+  let
+      /**
+       * If true, the app is busy processing a hash change.
+       * @type {Boolean}
+       */
+      busy = false,
+      /**
+       * If true, the app has successfully loaded a valid source file.
+       * @type {Boolean}
+       */
       loaded = false,
+      /**
+       * If loaded is true, this is the url of the loaded source file.
+       * @type {String|null}
+       */
       loadedSourceUrl = null,
+      /**
+       * If loaded is true, this is the data of the loaded source file.
+       * @type {Object|null}
+       */
       loadedSourceData = null,
+      /**
+       * Stores the ID of the timer that is used to update the extent config in the url.
+       * @type {Number|null}
+       */
       extentUpdateTimer = null,
+      /**
+       * Stores the last fitted stable map view extent.
+       * @type {Array.<Number>|null}
+       */
       fitExtent = null;
 
+  /**
+   * Start or restart the app with the given hash string.
+   * @param {String} hash
+   */
   const startWithHash = (hash) => {
     if (busy) {
       console.warn('Hash update while busy!');
@@ -816,6 +907,11 @@
     }
   };
 
+  /**
+   * Load OpenLayers layers from a list of layer configs.
+   * The list of layer configs can not be empty.
+   * @param {Array.<Object>} layerConfigs
+   */
   const loadLayers = function (layerConfigs) {
     if (!Array.isArray(layerConfigs)) {
       throw new TypeError('Expect layers to be an array.');
@@ -893,6 +989,10 @@
 
   const updateLayers = function (extraLayerConfigs) {
     this.forEach((layer) => {
+  /**
+   * Update the collection of OpenLayers layers with the given configs.
+   * @param {Object} extraLayerConfigs
+   */
       const layerId = layer.get('id');
       if (extraLayerConfigs.hasOwnProperty(layerId)) {
         const extraConfig = extraLayerConfigs[layerId];
@@ -910,6 +1010,11 @@
   };
 
   const setViewExtent = (extent) => {
+  /**
+   * Set the view extent in url hash.
+   * Updates the url hash when needed.
+   * @param {Array.<Number>} extent
+   */
     extentUpdateTimer = null;
 
     // If not loaded, do nothing.
@@ -926,6 +1031,9 @@
     });
   };
 
+  /**
+   * Handler for the start of a user interaction on the map.
+   */
   const userInteractionStart = () => {
     // Cancel pending extent updates.
     if (extentUpdateTimer !== null) {
@@ -933,6 +1041,10 @@
       extentUpdateTimer = null;
     }
   };
+
+  /**
+   * Handler for the end of a user interaction on the map.
+   */
   const userInteractionEnd = () => {
     // If not loaded, ignore these events.
     if (!loaded) {

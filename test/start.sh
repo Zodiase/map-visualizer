@@ -1,4 +1,5 @@
 #!/bin/bash
+# Start the testing.
 
 # Get script directory.
 TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
