@@ -851,7 +851,12 @@
       layerListControl.reload([], {});
       setMapProjection(null);
 
-      $notificationContainer.append($('<span>').text(hash));
+      $notificationContainer.append(
+        $('<div class="hashparse">')
+        .append($('<div>').text(`source: ${parse.source}`))
+        .append($('<div>').text(`config: ${JSON.stringify(extra.layerConfigs)}`))
+        .append($('<div>').text(`extent: ${JSON.stringify(extra.extent)}`))
+      );
       // Source Url is necessary.
       if (sourceUrl.length === 0) {
         // No source url available.
