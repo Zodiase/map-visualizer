@@ -8,6 +8,7 @@
     "compile": "babel src -d lib",
     "lint": "eslint src/*.js",
     "lint-test": "eslint test/test.js",
+    "test-build": "bash test/build.sh",
     "test-setup": "bash test/setup.sh",
     "test-host": "bash test/host.sh",
     "test": "bash test/start.sh"
