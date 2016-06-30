@@ -827,7 +827,7 @@
       // Source Url didn't change.
       console.log('Updating...');
       // Update layers.
-      updateLayers.call(mainLayerCollection, extra.layerConfigs);
+      updateLayers(mainLayerCollection, extra.layerConfigs);
       // Update map view extent.
       const newExtent = (extra.extent !== null) ? extra.extent : loadedSourceData.extent;
       if (!isIdenticalExtent(fitExtent, newExtent)) {
@@ -876,7 +876,7 @@
           // Load layers.
           loadLayers.call(mainLayerCollection, data.layers);
           // Update layers.
-          updateLayers.call(mainLayerCollection, extra.layerConfigs);
+          updateLayers(mainLayerCollection, extra.layerConfigs);
           // Update map view extent.
           const newExtent = (extra.extent !== null) ? extra.extent : data.extent;
           map.getView().fit(newExtent, map.getSize());
@@ -977,12 +977,13 @@
     }
   };
 
-  const updateLayers = function (extraLayerConfigs) {
-    this.forEach((layer) => {
   /**
    * Update the collection of OpenLayers layers with the given configs.
+   * @param {Array.<ol.layer.Base>} layerCollection
    * @param {Object} extraLayerConfigs
    */
+  const updateLayers = function (layerCollection, extraLayerConfigs) {
+    layerCollection.forEach((layer) => {
       const layerId = layer.get('id');
       if (extraLayerConfigs.hasOwnProperty(layerId)) {
         const extraConfig = extraLayerConfigs[layerId];
