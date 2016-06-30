@@ -1000,12 +1000,12 @@
     });
   };
 
-  const setViewExtent = (extent) => {
   /**
    * Set the view extent in url hash.
    * Updates the url hash when needed.
    * @param {Array.<Number>} extent
    */
+  const setHashViewExtent = (extent) => {
     extentUpdateTimer = null;
 
     // If not loaded, do nothing.
@@ -1057,7 +1057,7 @@
 
     fitExtent = viewExtent;
 
-    extentUpdateTimer = window.setTimeout(setViewExtent.bind(this, viewExtent), extentUpdateDelay);
+    extentUpdateTimer = window.setTimeout(setHashViewExtent.bind(this, viewExtent), extentUpdateDelay);
   };
 
   map.on('moveend', userInteractionEnd);
