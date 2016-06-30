@@ -359,12 +359,7 @@
     const layerElement = rowElement.parentElement;
     const layerId = layerElement.getAttribute('data-layer-id');
     const thisLayer = this.layerMap_[layerId];
-    let layerIndex = -1;
-    this.layers_.forEach((layer, index) => {
-      if (layer === thisLayer) {
-        layerIndex = index;
-      }
-    });
+    const layerIndex = this.layers_.indexOf(thisLayer);
 
     // Range check.
     if (layerIndex < 0 || layerIndex >= this.layers_.length) {
@@ -405,12 +400,7 @@
     const layerElement = rowElement.parentElement;
     const layerId = layerElement.getAttribute('data-layer-id');
     const thisLayer = this.layerMap_[layerId];
-    let layerIndex = -1;
-    this.layers_.forEach((layer, index) => {
-      if (layer === thisLayer) {
-        layerIndex = index;
-      }
-    });
+    const layerIndex = this.layers_.indexOf(thisLayer);
 
     // Range check.
     if (layerIndex < 0 || layerIndex >= this.layers_.length) {
