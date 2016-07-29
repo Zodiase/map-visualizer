@@ -1,4 +1,5 @@
 #!/bin/bash
+# Setup the test environment.
 
 OL_VER="3.15.1"
 JQ_VER="2.2.4"
@@ -9,10 +10,7 @@ TEST="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT="$TEST/.."
 
 npm install
-npm run build
-
-# Copy the built file to www.
-cp "$ROOT/lib/viewer.js" "$TEST/www/viewer.js"
+npm run test-build
 
 # Download selenium server.
 curl -o "$TEST/selenium.jar" "http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar"

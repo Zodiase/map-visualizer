@@ -225,3 +225,21 @@ html, body {
   -ms-flex-align: center;
   align-items: center;
 }
+
+#notifications > .hashparse {
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#notifications > .hashparse > div {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+#notifications > span {
+  word-wrap: break-word;
+  word-break: break-all;
+  text-align: center;
+}
