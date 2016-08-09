@@ -1,0 +1,44 @@
++------------------------------------------------------------------------------+
+|| Where to Start                                                             ||
++------------------------------------------------------------------------------+
+|                                                                              |
+| Aside from README.md and package.json (for Meteor), ./src/viewer.js should   |
+| be the entry point.                                                          |
+|                                                                              |
+| For better code quality and organization, ES6 is used and components/modules |
+| should use `import/export` syntax. See Build Process below for more detail.  |
+|                                                                              |
++------------------------------------------------------------------------------+
+|------------------------------------------------------------------------------|
+|| Local Testing                                                              ||
++------------------------------------------------------------------------------+
+|                                                                              |
+| A few commands are prepared for local development testing.                   |
+|                                                                              |
+| To prepare the project folder for local hosting or testing:                  |
+|  $ npm run test-setup                                                        |
+|                                                                              |
+| To host the app locally (after doing the preparation step):                  |
+|  $ npm run test-host                                                         |
+|                                                                              |
+| To run the tests locally (after doing the preparation step):                 |
+|  $ npm run test                                                              |
+|                                                                              |
++------------------------------------------------------------------------------+
+|------------------------------------------------------------------------------|
+|| Build Process                                                              ||
++------------------------------------------------------------------------------+
+|                                                                              |
+| Since browser support for ES6 is still near non-existent. ES6 source code    |
+| has to be transpiled to ES5 or earlier. Babel compiler is used for this and  |
+| Babel Polyfill is used to support new classes in ES6 such as Map and Set.    |
+|                                                                              |
+| After generating ES5 source code, it may be partitioned into multiple files  |
+| and may include `require` expressions. These files need to be bundled after  |
+| resolving those `require` expressions. Browserify is used for bundling and   |
+| `require` expression support.                                                |
+|                                                                              |
+| When building, transpiled code is saved at ./lib/src/ and will then be       |
+| bundled into ./lib/viewer.js.                                                |
+|                                                                              |
++------------------------------------------------------------------------------+
