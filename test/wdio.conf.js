@@ -145,15 +145,32 @@ exports.config = {
     // variables, such as `browser`. It is the perfect place to define custom commands.
     before: function (capabilities, specs) {
         global.webdriverio = require('webdriverio');
-        var chai = require('chai');
-        global.expect = chai.expect;
-        browser.addCommand('notificationCheck', function(location_hash,text1, text2) {
-            browser.url(location_hash);
-            browser.waitForExist('#notifications span'); 
-            var texts= browser.getText('#notifications span');
-            expect(texts[0]).to.equal(text1); 
-            expect(texts[1]).to.equal(text2);
-        });   
+        global.expect = require('chai').expect;
+        
+        browser.addCommand('notificationContains', function(text, timeout) {
+            if (typeof timeout === 'undefined') {
+                timeout = 300;
+            }
+            browser.waitForText('#notifications > span', timeout);
+            var texts = browser.getText('#notifications > span');
+            if (!Array.isArray(texts)) {
+                texts = [texts];
+            }
+            expect(texts).to.include(text);
+        });
+        
+        browser.addCommand('getLastNotification', function(text, timeout) {
+            if (typeof timeout === 'undefined') {
+                timeout = 300;
+            }
+            browser.waitForText('#notifications > span', timeout);
+            var texts = browser.getText('#notifications > span');
+            if (!Array.isArray(texts)) {
+                texts = [texts];
+            }
+            return texts[texts.length - 1];
+        });
+        
         browser.addCommand('waitELementDisappeared', function(selector){
             expect(browser.waitForExist(selector, 1000, true)).to.equal(true);
         });
@@ -172,7 +189,9 @@ exports.config = {
         });
         browser.addCommand('reseturl', function(location_hash){
            browser.url('/'); 
-           browser.url(location_hash);
+           if (location_hash !== '/') {
+               browser.url(location_hash);
+           }
         });
     },
     //
