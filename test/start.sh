@@ -24,7 +24,10 @@ done
 
 printf "\nRunning tests with WebDriver...\n"
 "$ROOT/node_modules/.bin/wdio" "$TEST/wdio.conf.js"
+RESULT=$?
 
 printf "\nKilling background processes..."
 kill $(jobs -rp) && wait $(jobs -rp) > /dev/null 2>&1
 printf "Done\n"
+
+exit $RESULT
