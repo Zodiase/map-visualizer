@@ -53,14 +53,16 @@ describe('source loading', function(){
     describe('source file', function(){
         describe('url', function(){
             it('should notify when no source file url included', function(){
-                location_hash = "/#source="
-                browser.reseturl(location_hash);
-                browser.notificationCheck(location_hash,'#source=','No source url available.');
+                browser.reseturl('/#source=');
+                browser.pause(300);
+                browser.notificationContains('No source url available.');
                 browser.waitELementDisappeared('.layer-list__body .layerlist__item');
             });
             it('should notifying user when no source url available', function(){ 
                 browser.log('browser');
-                browser.notificationCheck('/','', 'No source url available.');
+                browser.reseturl('/');
+                browser.pause(300);
+                browser.notificationContains('No source url available.');
             });
             //test will fail for this case now, need to change code
             it('should have list renewed when url changed', function(){
@@ -70,9 +72,11 @@ describe('source loading', function(){
         
         describe('file data', function(){
             it('should catch error when invalid json file format included', function(){
-                location_hash = "/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/invalid-json.json";
-                browser.reseturl(location_hash);
-                browser.notificationCheck(location_hash,'#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/invalid-json.json','Downloading source file...');
+                browser.reseturl('/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/invalid-json.json');
+                browser.pause(300);
+                browser.notificationContains('Downloading source file...');
+                var lastText = browser.getLastNotification();
+                expect(lastText).to.contain('parsererror, SyntaxError: ');
                 browser.waitELementDisappeared('.layer-list__body .layerlist__item');
             });
             it('should give correct data layer list when include a right format json file', function(){

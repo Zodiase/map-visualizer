@@ -236,7 +236,7 @@
                 "before": false
             }
         ],
-        "sort-imports": "error",
+        "sort-imports": "off",
         "sort-vars": "off",
         "space-before-blocks": "error",
         "space-before-function-paren": "error",
