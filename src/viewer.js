@@ -210,7 +210,7 @@ class Viewer {
      * @event Viewer#change:projection
      * @param {string} projName - Name of the new projection.
      */
-    this.trigger('change:projection', [ projName ]);
+    this.trigger('change:projection', [projName]);
   }
 
   /**
