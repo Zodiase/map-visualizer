@@ -10,7 +10,7 @@ class Viewer {
   /**
    * @param {HTMLElement} options.target
    */
-  constructor ({ target }) {
+  constructor ({target}) {
 
     /**
      * Initialize observable interface with the help of jQuery.
@@ -42,15 +42,20 @@ class Viewer {
 
   /**
    * To exclude native DOM events, this function ensures the actual event names are distinct.
+   * @param {string} eventType
+   * @return {string}
    */
   encodeEventType_ (eventType) {
-    return `_${eventType}`; //! Could be improved.
+    //! Could be improved.
+    return `_${eventType}`;
   }
 
   /**
    * To allow one set of event functions operating on multiple targets, the event type can
    * optionally have a target specified as: "target/eventType".
    * This helper function parses the generic eventType string.
+   * @param {string} eventType
+   * @return {{target: string, eventType: string}}
    */
   parseEventType_ (eventType) {
     const result = {
@@ -70,6 +75,13 @@ class Viewer {
     return result;
   }
 
+  /**
+   * Helper to run specific event related actions (binding, unbinding and triggering).
+   * @param {string} target - The target that the events belong to. Different targets might have different event binding/triggering APIs.
+   * @param {string} actionType - The type of action to run. Actions could be 'trigger', 'on', 'one' or 'off'.
+   * @param {Array} args - List of arguments for the action.
+   * @return {*}
+   */
   performEventAction_ (target, actionType, args) {
     if (this.eventMapping_.hasOwnProperty(target)) {
       const targetActions = this.eventMapping_[target];
@@ -83,40 +95,47 @@ class Viewer {
     }
   }
 
+  /**
+   * Execute all handlers and behaviors attached to the target for the given event type.
+   * @param {string} eventType - A string containing a JavaScript event type, such as `click` or `submit`.
+   * @param {Array} extraParameters - Additional parameters to pass along to the event handler.
+   * @return {*}
+   */
   trigger (eventType, extraParameters) {
-    // Check for event target.
     const parse = this.parseEventType_(eventType);
-
     return this.performEventAction_(parse.target, 'trigger', [parse.eventType, extraParameters]);
   }
 
   /**
-   * Register a callback for the event.
+   * Attach an event handler function for the event to the target.
+   * @param {string} eventType - The type of the event and optional namespaces.
+   * @param {Function} callback - A function to execute when the event is triggered.
+   * @return {*}
    */
   on (eventType, callback) {
-    // Check for event target.
     const parse = this.parseEventType_(eventType);
-
     return this.performEventAction_(parse.target, 'on', [parse.eventType, callback]);
   }
 
   /**
-   * Register a callback for the event. The callback is de-registered after running once.
+   * Attach a handler to an event for the target. The handler is executed at most once per target per event type.
+   * @param {string} eventType - The type of the event and optional namespaces.
+   * @param {Function} callback - A function to execute when the event is triggered.
+   * @return {*}
    */
   one (eventType, callback) {
-    // Check for event target.
     const parse = this.parseEventType_(eventType);
-
     return this.performEventAction_(parse.target, 'one', [parse.eventType, callback]);
   }
 
   /**
-   * De-register a callback for the event.
+   * Remove an event handler.
+   * @param {string} eventType - The type of the event and optional namespaces.
+   * @param {Function} callback - A handler function previously attached for the event(s).
+   * @return {*}
    */
   off (eventType, callback) {
-    // Check for event target.
     const parse = this.parseEventType_(eventType);
-
     return this.performEventAction_(parse.target, 'off', [parse.eventType, callback]);
   }
 
@@ -128,25 +147,17 @@ class Viewer {
    */
   getViewForProjection (projName) {
     const projKey = String(projName).toUpperCase();
-
     if (!this.mapViews_.hasOwnProperty(projKey)) {
-
       try {
-
         this.mapViews_[projKey] = new ol.View({
           projection: projKey,
           center: [0, 0],
           zoom: 0
         });
-
       } catch (err) {
-
         throw new Error(`Could not create map view for projection ${projKey}.`);
-
       }
-
     }
-
     return this.mapViews_[projKey];
   }
 
@@ -159,13 +170,10 @@ class Viewer {
   setMapProjection (projName) {
     const prev_mapView = this.map_.getView(),
           next_mapView = (projName === null) ? null : this.getViewForProjection(projName);
-
     if (prev_mapView === next_mapView) {
       return;
     }
-
     if (prev_mapView !== null) {
-
 //       prev_mapView.un('change:center', userInteractionStart);
 //       prev_mapView.un('change:resolution', userInteractionStart);
     }
