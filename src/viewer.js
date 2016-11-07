@@ -6,6 +6,12 @@ import {
   LayerListControl
 } from './ol.control.LayerList.js';
 
+/**
+ * Events:
+ * - change:center - When the center of the map view is changed.
+ * - change:resolution - When the resolution (zoom level) is changed.
+ * - change:projection - When the projection is changed.
+ */
 class Viewer {
   /**
    * @param {HTMLElement} options.target
@@ -19,7 +25,9 @@ class Viewer {
     this.element_ = $('<div>');
 
     // Initialize map.
+
     // Instantiate map controls.
+
     const layerListControl = new LayerListControl();
 
     this.map_ = new ol.Map({
@@ -38,6 +46,17 @@ class Viewer {
      * A map of projection => ol.View pairs.
      */
     this.mapViews_ = {};
+
+    // Initialize bound event handlers.
+
+    this.boundMapViewCenterChangeHandler_ = (function (...args) {
+      return this.trigger('change:center', ...args);
+    }).bind(this);
+
+    this.boundMapViewResolutionChangeHandler_ = (function (...args) {
+      return this.trigger('change:resolution', ...args);
+    }).bind(this);
+
   }
 
   /**
@@ -174,16 +193,24 @@ class Viewer {
       return;
     }
     if (prev_mapView !== null) {
-//       prev_mapView.un('change:center', userInteractionStart);
-//       prev_mapView.un('change:resolution', userInteractionStart);
+      prev_mapView.un('change:center', this.boundMapViewCenterChangeHandler_);
+      prev_mapView.un('change:resolution', this.boundMapViewResolutionChangeHandler_);
     }
 
     this.map_.setView(next_mapView);
 
     if (next_mapView !== null) {
-//       next_mapView.on('change:center', userInteractionStart);
-//       next_mapView.on('change:resolution', userInteractionStart);
+      next_mapView.on('change:center', this.boundMapViewCenterChangeHandler_);
+      next_mapView.on('change:resolution', this.boundMapViewResolutionChangeHandler_);
     }
+
+    /**
+     * Change of projection event.
+     *
+     * @event Viewer#change:projection
+     * @param {string} projName - Name of the new projection.
+     */
+    this.trigger('change:projection', [ projName ]);
   }
 
   /**
