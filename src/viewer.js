@@ -70,23 +70,24 @@ class Viewer {
     return result;
   }
 
+  performEventAction_ (target, actionType, args) {
+    if (this.eventMapping_.hasOwnProperty(target)) {
+      const targetActions = this.eventMapping_[target];
+      if (typeof targetActions[actionType] === 'function') {
+        return targetActions[actionType].apply(this, args);
+      } else {
+        throw new Error('Invalid action type');
+      }
+    } else {
+      throw new Error('Invalid target');
+    }
+  }
+
   trigger (eventType, extraParameters) {
     // Check for event target.
     const parse = this.parseEventType_(eventType);
 
-    switch (parse.target) {
-      // Default target is the class instance itself.
-      case '':
-        // Trigger handlers bound via jQuery without also triggering the native event.
-        return this.element_.triggerHandler(this.encodeEventType_(parse.eventType), extraParameters);
-        break;
-      case 'map':
-        return this.map_.dispatchEvent(parse.eventType);
-        break;
-      default:
-        throw new Error('Invalid target');
-        break;
-    }
+    return this.performEventAction_(parse.target, 'trigger', [parse.eventType, extraParameters]);
   }
 
   /**
@@ -96,18 +97,7 @@ class Viewer {
     // Check for event target.
     const parse = this.parseEventType_(eventType);
 
-    switch (parse.target) {
-      // Default target is the class instance itself.
-      case '':
-        return this.element_.on(this.encodeEventType_(parse.eventType), callback);
-        break;
-      case 'map':
-        return this.map_.on(parse.eventType, callback);
-        break;
-      default:
-        throw new Error('Invalid target');
-        break;
-    }
+    return this.performEventAction_(parse.target, 'on', [parse.eventType, callback]);
   }
 
   /**
@@ -117,18 +107,7 @@ class Viewer {
     // Check for event target.
     const parse = this.parseEventType_(eventType);
 
-    switch (parse.target) {
-      // Default target is the class instance itself.
-      case '':
-        return this.element_.one(this.encodeEventType_(parse.eventType), callback);
-        break;
-      case 'map':
-        return this.map_.once(parse.eventType, callback);
-        break;
-      default:
-        throw new Error('Invalid target');
-        break;
-    }
+    return this.performEventAction_(parse.target, 'one', [parse.eventType, callback]);
   }
 
   /**
@@ -138,18 +117,7 @@ class Viewer {
     // Check for event target.
     const parse = this.parseEventType_(eventType);
 
-    switch (parse.target) {
-      // Default target is the class instance itself.
-      case '':
-        return this.element_.off(this.encodeEventType_(parse.eventType), callback);
-        break;
-      case 'map':
-        return this.map_.un(parse.eventType, callback);
-        break;
-      default:
-        throw new Error('Invalid target');
-        break;
-    }
+    return this.performEventAction_(parse.target, 'off', [parse.eventType, callback]);
   }
 
   /**
@@ -257,6 +225,37 @@ class Viewer {
   }
 
 }
+Viewer.prototype.eventMapping_ = {
+  '': {
+    trigger (eventType, extraParameters) {
+      return this.element_.triggerHandler(this.encodeEventType_(eventType), extraParameters);
+    },
+    on (eventType, callback) {
+      return this.element_.on(this.encodeEventType_(eventType), callback);
+    },
+    one (eventType, callback) {
+      return this.element_.one(this.encodeEventType_(eventType), callback);
+    },
+    off (eventType, callback) {
+      return this.element_.off(this.encodeEventType_(eventType), callback);
+    }
+  },
+  'map': {
+    trigger (eventType, extraParameters) {
+      // For openlayers there is no way to send extra parameters to the event handler so `extraParameters` is discarded.
+      return this.map_.dispatchEvent(eventType);
+    },
+    on (eventType, callback) {
+      return this.map_.on(eventType, callback);
+    },
+    one (eventType, callback) {
+      return this.map_.once(eventType, callback);
+    },
+    off (eventType, callback) {
+      return this.map_.un(eventType, callback);
+    }
+  }
+};
 
 export {
   Viewer
