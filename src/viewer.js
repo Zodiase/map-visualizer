@@ -12,7 +12,10 @@ class Viewer {
    */
   constructor ({ target }) {
 
-    // Initialize observable interface with the help of jQuery.
+    /**
+     * Initialize observable interface with the help of jQuery.
+     * Event handlers are attached to this object.
+     */
     this.element_ = $('<div>');
 
     // Initialize map.
@@ -38,7 +41,7 @@ class Viewer {
   }
 
   /**
-   * To exclude native DOM events, this function ensures the actual event names are unique.
+   * To exclude native DOM events, this function ensures the actual event names are distinct.
    */
   encodeEventType_ (eventType) {
     return `_${eventType}`; //! Could be improved.
@@ -96,7 +99,7 @@ class Viewer {
     switch (parse.target) {
       // Default target is the class instance itself.
       case '':
-        return this.element_.on(this.encodeEventType_(eventType), callback);
+        return this.element_.on(this.encodeEventType_(parse.eventType), callback);
         break;
       case 'map':
         return this.map_.on(parse.eventType, callback);
@@ -117,7 +120,7 @@ class Viewer {
     switch (parse.target) {
       // Default target is the class instance itself.
       case '':
-        return this.element_.one(this.encodeEventType_(eventType), callback);
+        return this.element_.one(this.encodeEventType_(parse.eventType), callback);
         break;
       case 'map':
         return this.map_.once(parse.eventType, callback);
@@ -138,7 +141,7 @@ class Viewer {
     switch (parse.target) {
       // Default target is the class instance itself.
       case '':
-        return this.element_.off(this.encodeEventType_(eventType), callback);
+        return this.element_.off(this.encodeEventType_(parse.eventType), callback);
         break;
       case 'map':
         return this.map_.un(parse.eventType, callback);
