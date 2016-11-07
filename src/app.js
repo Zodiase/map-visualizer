@@ -254,8 +254,10 @@ const userInteractionEnd = () => {
   extentUpdateTimer = window.setTimeout(setHashViewExtent.bind(this, viewExtent), extentUpdateDelay);
 };
 
-map.on('moveend', userInteractionEnd);
-map.on('change:size', userInteractionStart);
+viewer.on('change:center', userInteractionStart);
+viewer.on('change:resolution', userInteractionStart);
+viewer.on('map/change:size', userInteractionStart);
+viewer.on('map/moveend', userInteractionEnd);
 
 $(window).on('load', () => {
   startWithHash(location.hash);
@@ -265,4 +267,4 @@ $(window).on('load', () => {
   });
 });
 
-window.__map = map;
+window.__viewer = viewer;
