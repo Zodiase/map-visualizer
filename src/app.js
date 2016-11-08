@@ -89,7 +89,7 @@ class App {
 
     this.viewer_.on('change:center', this.boundUserInteractionStart_);
     this.viewer_.on('change:resolution', this.boundUserInteractionStart_);
-    this.viewer_.on('map/change:size', this.userInteractionStart_);
+    this.viewer_.on('map/change:size', this.boundUserInteractionStart_);
     this.viewer_.on('map/moveend', this.boundUserInteractionEnd_);
   }
 
