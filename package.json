@@ -5,7 +5,7 @@
   "main": "src/viewer.js",
   "scripts": {
     "build": "npm run lint && npm run compile",
-    "compile": "babel src -d lib/src && browserify lib/src/viewer.js -o lib/viewer.js",
+    "compile": "babel src -d lib/src && browserify lib/src/app.js -o lib/app.js && browserify lib/src/viewer.js -o lib/viewer.js",
     "lint": "eslint src/*.js",
     "lint-test": "eslint test/test.js",
     "test-build": "bash test/build.sh",
