@@ -12,11 +12,18 @@ ROOT="$TEST/.."
 npm install
 npm run test-build
 
+function download_if_not_found {
+  if [ ! -f "$1" ]; then
+    curl -o "$1" "$2"
+  fi
+}
+
 # Download selenium server.
-curl -o "$TEST/selenium.jar" "http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar"
+download_if_not_found "$TEST/selenium.jar" "http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar"
 
 # Download OpenLayers files.
-curl -o "$TEST/www/ol.css" "https://cdnjs.cloudflare.com/ajax/libs/ol3/$OL_VER/ol.css"
-curl -o "$TEST/www/ol.js" "https://cdnjs.cloudflare.com/ajax/libs/ol3/$OL_VER/ol.js"
-curl -o "$TEST/www/jquery.js" "https://cdnjs.cloudflare.com/ajax/libs/jquery/$JQ_VER/jquery.js"
-curl -o "$TEST/www/babel-polyfill.js" "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/$BB_VER/polyfill.js"
+download_if_not_found "$TEST/www/ol.css" "https://cdnjs.cloudflare.com/ajax/libs/ol3/$OL_VER/ol.css"
+
+download_if_not_found "$TEST/www/ol.js" "https://cdnjs.cloudflare.com/ajax/libs/ol3/$OL_VER/ol.js"
+download_if_not_found "$TEST/www/jquery.js" "https://cdnjs.cloudflare.com/ajax/libs/jquery/$JQ_VER/jquery.js"
+download_if_not_found "$TEST/www/babel-polyfill.js" "https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/$BB_VER/polyfill.js"
