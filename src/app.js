@@ -29,20 +29,27 @@ import {
   Viewer
 } from './viewer.js';
 
+import {
+  OverlayControl
+} from './ol.control.Overlay.js';
+
 class App {
   /**
    * @param {string} options.mapContainerSelector
-   * @param {string} options.notificationContainerSelector
    */
-  constructor ({mapContainerSelector, notificationContainerSelector}) {
+  constructor ({mapContainerSelector}) {
     this.$mapContainer_ = $(mapContainerSelector);
-    this.$notificationContainer_ = $(notificationContainerSelector);
-    if (this.$mapContainer_.length === 0 || this.$notificationContainer_.length === 0) {
+    if (this.$mapContainer_.length === 0) {
       throw new ReferenceError('Can not find elements.');
     }
 
+    this.overlay_ = new OverlayControl();
+
     this.viewer_ = new Viewer({
-      target: this.$mapContainer_[0]
+      target: this.$mapContainer_[0],
+      controls: [
+        this.overlay_
+      ]
     });
 
     // Runtime data.
@@ -148,10 +155,10 @@ class App {
       this.loadedSourceData_ = null;
       this.fitExtent_ = null;
       this.viewer_.removeAllLayers();
-      this.$notificationContainer_.empty();
+      this.overlay_.empty();
       this.viewer_.setMapProjection(null);
 
-      this.$notificationContainer_.append(
+      this.overlay_.append(
         $('<div class="hashparse">')
         .append($('<div>').text(`source: ${parse.source}`))
         .append($('<div>').text(`config: ${JSON.stringify(extra.layerConfigs)}`))
@@ -161,20 +168,20 @@ class App {
       if (sourceUrl.length === 0) {
         // No source url available.
         warn('No source url available.');
-        this.$notificationContainer_.append($('<span>').text('No source url available.'));
+        this.overlay_.appendText('No source url available.');
         return;
       }
       log('Downloading source file...');
-      this.$notificationContainer_.append($('<span>').text('Downloading source file...'));
+      this.overlay_.appendText('Downloading source file...');
       $.getJSON(sourceUrl)
       .fail((jqxhr, textStatus, err) => {
         const errStr = `${textStatus}, ${err}`;
         error(errStr);
-        this.$notificationContainer_.append($('<span>').text(errStr));
+        this.overlay_.appendText(errStr);
       })
       .done((data) => {
         info('Downloaded', data);
-        this.$notificationContainer_.empty();
+        this.overlay_.empty();
         try {
           // Load projection from source file or use default.
           this.viewer_.setMapProjection(data.projection || DefaultProjection);
@@ -192,7 +199,7 @@ class App {
           log('Loaded');
         } catch (err) {
           error(err);
-          this.$notificationContainer_.append($('<span>').text(err));
+          this.overlay_.appendText(err);
         }
         this.busy_ = false;
       });
@@ -251,8 +258,7 @@ class App {
 }
 
 const app = new App({
-  mapContainerSelector: '#map',
-  notificationContainerSelector: '#notifications'
+  mapContainerSelector: '#map'
 });
 
 $(window).on('load', () => {
