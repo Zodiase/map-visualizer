@@ -23,7 +23,7 @@ export const LayerListControl = function (opt_options) {
   // @type {Array.<Object>}
   this.layers_ = [];
   // @type {Object.<String, Object>}
-  this.layerMap_ = {};
+  this.layersIndex_ = {};
 
   // The actual button to toggle the layer list.
   this.toggleButton_ = document.createElement('button');
@@ -141,7 +141,7 @@ LayerListControl.prototype.toggleLayerVisibilityHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const layer = this.layerMap_[layerId];
+  const layer = this.layersIndex_[layerId];
   layer.visible = !layer.visible;
 
   // Update hash.
@@ -164,7 +164,7 @@ LayerListControl.prototype.promoteLayerHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   const layerIndex = this.layers_.indexOf(thisLayer);
 
   // Range check.
@@ -205,7 +205,7 @@ LayerListControl.prototype.demoteLayerHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   const layerIndex = this.layers_.indexOf(thisLayer);
 
   // Range check.
@@ -262,7 +262,7 @@ LayerListControl.prototype.changeLayerOpacityHandler_ = function (event) {
   const layerElement = rowElement.parentElement;
   const opacityToggle = layerElement.querySelector(`.${this.CssClasses_.ItemAction_Opacity}`);
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   // @range [1, 100]
   const inputValue = input.value;
   const opacityValue = inputValue * 0.01;
@@ -379,8 +379,8 @@ LayerListControl.prototype.reload = function (layerConfigs, extraLayerConfigs) {
     container.removeChild(container.lastChild);
   }
   this.layers_.length = 0;
-  for (let key of Object.keys(this.layerMap_)) {
-    delete this.layerMap_[key];
+  for (let key of Object.keys(this.layersIndex_)) {
+    delete this.layersIndex_[key];
   }
 
   // Load layers into internal data structure.
@@ -405,7 +405,7 @@ LayerListControl.prototype.reload = function (layerConfigs, extraLayerConfigs) {
     }
 
     this.layers_.push(newLayer);
-    this.layerMap_[layerId] = newLayer;
+    this.layersIndex_[layerId] = newLayer;
   });
 
   this.sortLayers_();
@@ -461,8 +461,8 @@ LayerListControl.prototype.update = function (extraLayerConfigs) {
         $listItems.detach().sort((a, b) => {
           const layerIdA = a.getAttribute('data-layer-id'),
                 layerIdB = b.getAttribute('data-layer-id');
-          const layerA = this.layerMap_[layerIdA],
-                layerB = this.layerMap_[layerIdB];
+          const layerA = this.layersIndex_[layerIdA],
+                layerB = this.layersIndex_[layerIdB];
           return this.compareLayerOrder_(layerA, layerB);
         })
     );
@@ -474,7 +474,7 @@ LayerListControl.prototype.update = function (extraLayerConfigs) {
     const layerRowElement = this;
 
     const layerId = layerRowElement.getAttribute('data-layer-id');
-    const layer = this_.layerMap_[layerId];
+    const layer = this_.layersIndex_[layerId];
 
     if (!layer.visible) {
       layerRowElement.classList.add(this_.CssClasses_.Item_Hidden);
