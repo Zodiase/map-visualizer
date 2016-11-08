@@ -86,6 +86,14 @@ class App {
     this.viewer_.on('map/moveend', this.boundUserInteractionEnd_);
   }
 
+  // Cancel any pending extent updates.
+  cancelPendingExtentUpdates_ () {
+    if (this.extentUpdateTimer_ !== null) {
+      window.clearTimeout(this.extentUpdateTimer_);
+      this.extentUpdateTimer_ = null;
+    }
+  }
+
   /**
    * Start or restart the app with the given hash string.
    * @param {String} hash
@@ -99,10 +107,7 @@ class App {
     this.busy_ = true;
 
     // Cancel any extent updates.
-    if (this.extentUpdateTimer_ !== null) {
-      window.clearTimeout(this.extentUpdateTimer_);
-      this.extentUpdateTimer_ = null;
-    }
+    this.cancelPendingExtentUpdates_();
 
     info('Hash', hash);
     const parse = parseHashString(hash);
@@ -201,11 +206,7 @@ class App {
    * Handler for the start of a user interaction on the map.
    */
   userInteractionStart_ () {
-    // Cancel pending extent updates.
-    if (this.extentUpdateTimer_ !== null) {
-      window.clearTimeout(this.extentUpdateTimer_);
-      this.extentUpdateTimer_ = null;
-    }
+    this.cancelPendingExtentUpdates_();
   }
 
   /**
@@ -217,11 +218,7 @@ class App {
       return;
     }
 
-    // Cancel pending extent updates.
-    if (this.extentUpdateTimer_ !== null) {
-      window.clearTimeout(this.extentUpdateTimer_);
-      this.extentUpdateTimer_ = null;
-    }
+    this.cancelPendingExtentUpdates_();
 
     const viewExtent = map.getView().calculateExtent(map.getSize());
 
