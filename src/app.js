@@ -99,6 +99,7 @@ class App {
    * @param {String} hash
    */
   startWithHash (hash) {
+    // The app should not be busy while processing a new hash.
     if (this.busy_) {
       warn('Hash update while busy!');
       location.reload();
@@ -123,19 +124,19 @@ class App {
     // Extent String is optional.
     extra.extent = parseExtentString(extentString);
     info('extra.extent', extra.extent);
+
     if (this.loaded_ && sourceUrl === this.loadedSourceUrl_) {
       // Source Url didn't change.
       log('Updating...');
       // Update layers.
-      this.viewer_.updateLayers(mainLayerCollection, extra.layerConfigs);
+      this.viewer_.updateLayers(extra.layerConfigs);
       // Update map view extent.
       const newExtent = (extra.extent !== null) ? extra.extent : this.loadedSourceData_.extent;
       if (!isIdenticalExtent(this.fitExtent_, newExtent)) {
-        map.getView().fit(newExtent, map.getSize());
-        this.fitExtent_ = map.getView().calculateExtent(map.getSize());
+        this.fitExtent_ = this.viewer_.setExtent(newExtent);
       }
 
-      layerListControl.update(extra.layerConfigs);
+      //!layerListControl.update(extra.layerConfigs);
 
       log('Updated');
       this.busy_ = false;
@@ -146,9 +147,8 @@ class App {
       this.loadedSourceUrl_ = null;
       this.loadedSourceData_ = null;
       this.fitExtent_ = null;
-      mainLayerCollection.clear();
+      this.viewer_.removeAllLayers();
       this.$notificationContainer_.empty();
-      layerListControl.reload([], {});
       this.viewer_.setMapProjection(null);
 
       this.$notificationContainer_.append(
@@ -178,16 +178,13 @@ class App {
         try {
           // Load projection from source file or use default.
           this.viewer_.setMapProjection(data.projection || DefaultProjection);
-          // Load layers.
-          this.viewer_.loadLayers(mainLayerCollection, data.layers);
-          // Update layers.
-          this.viewer_.updateLayers(mainLayerCollection, extra.layerConfigs);
           // Update map view extent.
           const newExtent = (extra.extent !== null) ? extra.extent : data.extent;
-          map.getView().fit(newExtent, map.getSize());
-          this.fitExtent_ = map.getView().calculateExtent(map.getSize());
+          this.fitExtent_ = this.viewer_.setExtent(newExtent);
+          // Load layers.
+          this.viewer_.loadLayers(data.layers, extra.layerConfigs);
 
-          layerListControl.reload(data.layers, extra.layerConfigs);
+          //!layerListControl.reload(data.layers, extra.layerConfigs);
 
           this.loaded_ = true;
           this.loadedSourceUrl_ = sourceUrl;
@@ -220,7 +217,7 @@ class App {
 
     this.cancelPendingExtentUpdates_();
 
-    const viewExtent = map.getView().calculateExtent(map.getSize());
+    const viewExtent = this.viewer_.getExtent();
 
     // Check if need to update extent.
     if (isIdenticalExtent(this.fitExtent_, viewExtent)) {
