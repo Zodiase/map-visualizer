@@ -1,5 +1,5 @@
 exports.config = {
-    
+
     //
     // ==================
     // Specify Test Files
@@ -126,7 +126,7 @@ exports.config = {
         ui: 'bdd',
         timeout: 100000
         //compilers: ['js:babel-register', 'js:babel-polyfill']
-        
+
     },
     //
     // =====
@@ -146,31 +146,31 @@ exports.config = {
     before: function (capabilities, specs) {
         global.webdriverio = require('webdriverio');
         global.expect = require('chai').expect;
-        
+
         browser.addCommand('notificationContains', function(text, timeout) {
             if (typeof timeout === 'undefined') {
                 timeout = 300;
             }
-            browser.waitForText('#notifications > span', timeout);
-            var texts = browser.getText('#notifications > span');
+            browser.waitForText('#map > .ol-viewport .overlay > span', timeout);
+            var texts = browser.getText('#map > .ol-viewport .overlay > span');
             if (!Array.isArray(texts)) {
                 texts = [texts];
             }
             expect(texts).to.include(text);
         });
-        
+
         browser.addCommand('getLastNotification', function(text, timeout) {
             if (typeof timeout === 'undefined') {
                 timeout = 300;
             }
-            browser.waitForText('#notifications > span', timeout);
-            var texts = browser.getText('#notifications > span');
+            browser.waitForText('#map > .ol-viewport .overlay > span', timeout);
+            var texts = browser.getText('#map > .ol-viewport .overlay > span');
             if (!Array.isArray(texts)) {
                 texts = [texts];
             }
             return texts[texts.length - 1];
         });
-        
+
         browser.addCommand('waitELementDisappeared', function(selector){
             expect(browser.waitForExist(selector, 1000, true)).to.equal(true);
         });
@@ -188,7 +188,7 @@ exports.config = {
             browser.pause(1000);
         });
         browser.addCommand('reseturl', function(location_hash){
-           browser.url('/'); 
+           browser.url('/');
            if (location_hash !== '/') {
                browser.url(location_hash);
            }
@@ -197,7 +197,7 @@ exports.config = {
     //
     // Hook that gets executed before the suite starts
     beforeSuite: function (suite) {
-        
+
     },
     //
     // Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
