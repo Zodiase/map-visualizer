@@ -143,8 +143,6 @@ class App {
         this.fitExtent_ = this.viewer_.setExtent(newExtent);
       }
 
-      //!layerListControl.update(extra.layerConfigs);
-
       log('Updated');
       this.busy_ = false;
     } else {
@@ -154,7 +152,7 @@ class App {
       this.loadedSourceUrl_ = null;
       this.loadedSourceData_ = null;
       this.fitExtent_ = null;
-      this.viewer_.removeAllLayers();
+      this.viewer_.setLayers([]);
       this.overlay_.empty();
       this.viewer_.setMapProjection(null);
 
@@ -189,9 +187,7 @@ class App {
           const newExtent = (extra.extent !== null) ? extra.extent : data.extent;
           this.fitExtent_ = this.viewer_.setExtent(newExtent);
           // Load layers.
-          this.viewer_.loadLayers(data.layers, extra.layerConfigs);
-
-          //!layerListControl.reload(data.layers, extra.layerConfigs);
+          this.viewer_.setLayers(data.layers, extra.layerConfigs);
 
           this.loaded_ = true;
           this.loadedSourceUrl_ = sourceUrl;

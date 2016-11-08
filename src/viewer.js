@@ -46,7 +46,6 @@ class Viewer {
     this.map_.setTarget(target);
 
     this.mainLayerGroup_ = this.map_.getLayerGroup();
-    this.mainLayerCollection_ = this.mainLayerGroup_.getLayers();
 
     /**
      * A map of projection => ol.View pairs.
@@ -220,39 +219,31 @@ class Viewer {
   }
 
   /**
-   * Remove all loaded layers.
-   */
-  removeAllLayers () {
-    this.mainLayerCollection_.clear();
-    this.layerListControl_.reload([], {});
-  }
-
-  /**
    * Load OpenLayers layers from a list of layer configs.
    * The list of layer configs can not be empty.
    * Can optionally load extra layer configs at the same time.
    * @param {Array.<Object>} layerConfigs
    * @param {Object} extraLayerConfigs
    */
-  loadLayers (layerConfigs, extraLayerConfigs = {}) {
+  setLayers (layerConfigs, extraLayerConfigs = {}) {
     if (!Array.isArray(layerConfigs)) {
       throw new TypeError('Expect layers to be an array.');
     }
-    if (layerConfigs.length === 0) {
-      throw new RangeError('There is no layer to load.');
-    }
 
-    // Create new layers.
-    for (let config of layerConfigs) {
+    const newLayers = layerConfigs.map((config) => {
       if (typeof config !== 'object') {
         throw new TypeError('Expect each layer to be an object.');
       }
 
       const layer = getLayerFromConfig(config);
+      layer.config_ = config;
 
       this.applyExtraConfig_(layer, extraLayerConfigs);
-      this.mainLayerCollection_.push(layer);
-    }
+
+      return layer;
+    });
+
+    this.mainLayerGroup_.setLayers(new ol.Collection(newLayers));
   }
 
   /**
@@ -283,7 +274,8 @@ class Viewer {
    * @param {Object} extraLayerConfigs
    */
   updateLayers (extraLayerConfigs) {
-    this.mainLayerCollection_.forEach((layer) => this.applyExtraConfig_(layer, extraLayerConfigs));
+    this.layerListControl_.update(extraLayerConfigs);
+    this.mainLayerGroup_.getLayers().forEach((layer) => this.applyExtraConfig_(layer, extraLayerConfigs));
   }
 
   /**
