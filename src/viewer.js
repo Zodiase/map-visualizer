@@ -220,49 +220,86 @@ class Viewer {
   }
 
   /**
+   * Remove all loaded layers.
+   */
+  removeAllLayers () {
+    this.mainLayerCollection_.clear();
+    this.layerListControl_.reload([], {});
+  }
+
+  /**
    * Load OpenLayers layers from a list of layer configs.
    * The list of layer configs can not be empty.
-   * @param {ol.Collection} currentLayerCollection
+   * Can optionally load extra layer configs at the same time.
    * @param {Array.<Object>} layerConfigs
+   * @param {Object} extraLayerConfigs
    */
-  loadLayers (currentLayerCollection, layerConfigs) {
+  loadLayers (layerConfigs, extraLayerConfigs = {}) {
     if (!Array.isArray(layerConfigs)) {
       throw new TypeError('Expect layers to be an array.');
     }
     if (layerConfigs.length === 0) {
       throw new RangeError('There is no layer to load.');
     }
-    // Create layers.
+
+    // Create new layers.
     for (let config of layerConfigs) {
       if (typeof config !== 'object') {
         throw new TypeError('Expect each layer to be an object.');
       }
+
       const layer = getLayerFromConfig(config);
-      currentLayerCollection.push(layer);
+
+      this.applyExtraConfig_(layer, extraLayerConfigs);
+      this.mainLayerCollection_.push(layer);
     }
   }
 
   /**
+   * Add extra configs to the layer if available.
+   * @param {ol.layer.Base} layer
+   * @param {Object} extraLayerConfigs
+   * @return {ol.layer.Base}
+   */
+  applyExtraConfig_ (layer, extraLayerConfigs = {}) {
+    const layerId = layer.get('id');
+    if (extraLayerConfigs.hasOwnProperty(layerId)) {
+      const extraConfig = extraLayerConfigs[layerId];
+      if (extraConfig.hasOwnProperty('zIndex')) {
+        layer.setZIndex(extraConfig.zIndex);
+      }
+      if (extraConfig.hasOwnProperty('visible')) {
+        layer.setVisible(extraConfig.visible);
+      }
+      if (extraConfig.hasOwnProperty('opacity')) {
+        layer.setOpacity(extraConfig.opacity);
+      }
+    }
+    return layer;
+  }
+
+  /**
    * Update the collection of OpenLayers layers with the given configs.
-   * @param {Array.<ol.layer.Base>} layerCollection
    * @param {Object} extraLayerConfigs
    */
-  updateLayers (layerCollection, extraLayerConfigs) {
-    layerCollection.forEach((layer) => {
-      const layerId = layer.get('id');
-      if (extraLayerConfigs.hasOwnProperty(layerId)) {
-        const extraConfig = extraLayerConfigs[layerId];
-        if (extraConfig.hasOwnProperty('zIndex')) {
-          layer.setZIndex(extraConfig.zIndex);
-        }
-        if (extraConfig.hasOwnProperty('visible')) {
-          layer.setVisible(extraConfig.visible);
-        }
-        if (extraConfig.hasOwnProperty('opacity')) {
-          layer.setOpacity(extraConfig.opacity);
-        }
-      }
-    });
+  updateLayers (extraLayerConfigs) {
+    this.mainLayerCollection_.forEach((layer) => this.applyExtraConfig_(layer, extraLayerConfigs));
+  }
+
+  /**
+   * Make the current view fit to the given extent.
+   * Returns the new extent in effect.
+   */
+  setExtent (newExtent) {
+    this.map_.getView().fit(newExtent, this.map_.getSize());
+    return this.getExtent();
+  }
+
+  /**
+   * Return the current extent of the current view.
+   */
+  getExtent () {
+    return this.map_.getView().calculateExtent(this.map_.getSize());
   }
 
 }
