@@ -15,8 +15,9 @@ import {
 class Viewer {
   /**
    * @param {HTMLElement} options.target
+   * @param {Array.<ol.control.Control>} options.controls - Extra controls.
    */
-  constructor ({target}) {
+  constructor ({target, controls}) {
 
     /**
      * Initialize observable interface with the help of jQuery.
@@ -28,12 +29,17 @@ class Viewer {
 
     // Instantiate map controls.
 
-    const layerListControl = new LayerListControl();
+    this.layerListControl_ = new LayerListControl();
+
+    let defaultControls = [
+      this.layerListControl_
+    ];
+    if (typeof controls !== 'undefined') {
+      defaultControls = defaultControls.concat(controls);
+    }
 
     this.map_ = new ol.Map({
-      controls: ol.control.defaults().extend([
-        layerListControl
-      ]),
+      controls: ol.control.defaults().extend(defaultControls),
       view: null
     });
 
