@@ -180,6 +180,7 @@ describe('source loading', function(){
 
                 // Expand the layer list.
                 browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
 
                 var row1 = '.layer-list__item:nth-child(1) .layer-list__item-row';
                 browser.waitForExist(row1);
