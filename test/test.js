@@ -287,39 +287,63 @@ describe('source loading', function(){
 
             //! case when giving an invalid number as order
         });
-        describe.skip('visible test', function(){
+
+        describe('layer visibility test', function(){
+
             it('should add layer-list__item--hidden class when click the hidden button', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
-                browser.waitForExist('.layer-list__toggle button');
-                var button = '.layer-list__toggle button';
-                browser.click(button);
-                var row1 = '.layer-list__item:nth-child(1) .layer-list__item-row';
-                browser.waitForExist(row1);
-                browser.moveToObject(row1);
-                var row1_visible = row1 + " .layer-list__item__action-hide";
-                browser.waitForVisible(row1_visible, 5000);
-                browser.click(row1_visible);
-                expect(browser.getAttribute('.layer-list__item:nth-child(1)','class')).to.equal('layer-list__item layer-list__item--hidden');
-                browser.click(button);
 
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
+
+                var row1 = '.layer-list__item:nth-child(1) .layer-list__item-row';
+                var row1_visible = row1 + " .layer-list__item__action-hide";
+                browser.waitForExist(row1);
+                browser.moveToObject(row1).moveToObject(row1_visible).click(row1_visible);
+                expect(browser.getAttribute('.layer-list__item:nth-child(1)','class')).to.equal('layer-list__item layer-list__item--hidden');
+
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
+
             it('should see the config string changed when click the hidden button', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
-                browser.waitForExist('.layer-list__toggle button');
-                var button = '.layer-list__toggle button';
-                browser.click(button);
+
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
+
                 var row2 = '.layer-list__item:nth-child(2) .layer-list__item-row';
+                var row2_visible = row2 + " .layer-list__item__action-hide";
                 browser.waitForExist(row2);
                 browser.moveToObject(row2);
-                var row2_visible = row2 + " .layer-list__item__action-hide";
-                browser.waitForVisible(row2_visible, 5000);
-                browser.click(row2_visible);
+                browser.moveToObject(row2).moveToObject(row2_visible).click(row2_visible);
                 expect(browser.getUrl()).to.equal('http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.1_-_osm___0_0_0.1');
-                browser.click(button);
+
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
+
             it('should add layer-list__item--hidden class when config string changed', function(){
                 browser.reseturl("http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_0_0.1_-_osm___1_0_0.1");
-                browser.waitForExist('.layer-list__item-row');
+
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
+
                 var vis_obj = browser.execute(function(){
                     visible1 = window.__app.viewer_.map_.getLayers().item(0).get('visible');
                     visible2 = window.__app.viewer_.map_.getLayers().item(1).get('visible');
@@ -330,6 +354,9 @@ describe('source loading', function(){
                 });
                 expect(vis_obj.value.vis1).to.equal(false);
                 expect(vis_obj.value.vis2).to.equal(false);
+
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
         });
     });
