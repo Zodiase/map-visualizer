@@ -101,6 +101,7 @@ describe('source loading', function(){
             });
 
         });
+
     });
 
     describe('config string', function(){
@@ -358,7 +359,9 @@ describe('source loading', function(){
                 // Collapse the layer list.
                 browser.click(layerListToggleButtonQuery);
             });
+
         });
+
     });
     describe.skip('extent string', function(){
         it('should follow extent set by url if any', function(){
