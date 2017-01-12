@@ -335,7 +335,7 @@ describe('source loading', function(){
             });
 
             it('should add layer-list__item--hidden class when config string changed', function(){
-                browser.reseturl("http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_0_0.1_-_osm___1_0_0.1");
+                browser.reseturl("/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_0_0.1_-_osm___1_0_0.1");
 
                 // Wait for layer list to be ready.
                 var layerListToggleButtonQuery = '.layer-list__toggle button';
@@ -405,9 +405,9 @@ describe('source loading', function(){
             });
             expect(center.value).to.deep.equal(absCenter);
         });
-        it('should catch error when extent string contains invalid data', function(){
 
-        });
+        it('should catch error when extent string contains invalid data');
+
     });
 
     after(function(done) {
