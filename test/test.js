@@ -205,22 +205,31 @@ describe('source loading', function(){
                 browser.click(layerListToggleButtonQuery);
             });
 
-            it.skip('should change the config string when layer order changed', function(){
+            it('should change the config string when layer order changed', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
-                browser.waitForExist('.layer-list__toggle button');
-                var button = '.layer-list__toggle button';
-                browser.click(button);
+
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
+                browser.saveScreenshot('after expanding layer list');
+
                 var row1 = '.layer-list__item:nth-child(1) .layer-list__item-row';
                 browser.waitForExist(row1);
-                browser.moveToObject(row1);
+
                 var row1_down = row1 + ' .layer-list__item__action-demote';
-                browser.waitForVisible(row1_down, 5000);
-                browser.click(row1_down);
+                browser.moveToObject(row1).moveToObject(row1_down).click(row1_down);
+                // Wait for the change to be reflected in the url.
                 browser.pause(1000);
-                var url = browser.getUrl();
-                expect(url).to.equal('http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.1_-_osm___1_1_0.1');
-                browser.click(button);
+                expect(browser.getUrl()).to.equal('http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.1_-_osm___1_1_0.1');
+
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
+
             it.skip('should not change layer order when trying to move the top layer up or bottom layer down', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
                 browser.waitForExist('.layer-list__toggle button');
