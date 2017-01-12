@@ -75,7 +75,7 @@ describe('source loading', function(){
                 browser.notificationContains('No source url available.');
             });
 
-            //test will fail for this case now, need to change code
+            //! test will fail for this case now, need to change code
             it('should have list renewed when url changed');
 
         });
@@ -284,7 +284,8 @@ describe('source loading', function(){
                 // Collapse the layer list.
                 browser.click(layerListToggleButtonQuery);
             });
-            //case when giving an invalid number as order
+
+            //! case when giving an invalid number as order
         });
         describe.skip('visible test', function(){
             it('should add layer-list__item--hidden class when click the hidden button', function(){
