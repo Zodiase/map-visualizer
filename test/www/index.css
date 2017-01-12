@@ -194,7 +194,7 @@ html, body {
 }
 
 
-#notifications {
+#map > .ol-viewport .overlay {
   position: absolute;
   z-index: 2;
   top: 0;
@@ -226,19 +226,23 @@ html, body {
   align-items: center;
 }
 
-#notifications > .hashparse {
+#map > .ol-viewport .overlay > .interactive {
+  pointer-events: all;
+}
+
+#map > .ol-viewport .overlay > .hashparse {
   max-width: 80%;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#notifications > .hashparse > div {
+#map > .ol-viewport .overlay > .hashparse > div {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-#notifications > span {
+#map > .ol-viewport .overlay > span {
   word-wrap: break-word;
   word-break: break-all;
   text-align: center;

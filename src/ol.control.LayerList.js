@@ -17,13 +17,15 @@ import {
 
 // Layer List Control constructor.
 export const LayerListControl = function (opt_options) {
+  // Unable to get the map here.
+
   const options = opt_options || {};
 
   // Internal data structure storing layers.
   // @type {Array.<Object>}
   this.layers_ = [];
   // @type {Object.<String, Object>}
-  this.layerMap_ = {};
+  this.layersIndex_ = {};
 
   // The actual button to toggle the layer list.
   this.toggleButton_ = document.createElement('button');
@@ -79,12 +81,34 @@ export const LayerListControl = function (opt_options) {
   this.element_.appendChild(this.layerListContainer_);
   this.element_.appendChild(this.toggleButtonWrapper_);
 
+  /**
+   * @private
+   * @type {ol.Map}
+   */
+  this.map_ = null;
+
+  // Create bound handlers.
+  this.boundLayerChangeHandler_ = this.layerChangeHandler_.bind(this);
+
   ol.control.Control.call(this, {
     element: this.element_,
     target: options.target
   });
 };
 ol.inherits(LayerListControl, ol.control.Control);
+
+LayerListControl.prototype.setMap = function (map) {
+  if (this.map_) {
+    this.map_.getLayerGroup().un('change:layers', this.boundLayerChangeHandler_);
+  }
+
+  ol.control.Control.prototype.setMap.call(this, map);
+
+  if (map) {
+    this.map_ = map;
+    this.map_.getLayerGroup().on('change:layers', this.boundLayerChangeHandler_);
+  }
+};
 
 LayerListControl.prototype.CssClasses_ = {
   "ListExpanded": "layer-list--expanded",
@@ -96,6 +120,14 @@ LayerListControl.prototype.CssClasses_ = {
   "ItemAction_Promote": "layer-list__item__action-promote",
   "ItemAction_Demote": "layer-list__item__action-demote",
   "ItemAction_Opacity": "layer-list__item__action-opacity"
+};
+
+/**
+ * Handler for map layer changes.
+ * Reloads the layer list.
+ */
+LayerListControl.prototype.layerChangeHandler_ = function () {
+  this.reload_();
 };
 
 /**
@@ -141,7 +173,7 @@ LayerListControl.prototype.toggleLayerVisibilityHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const layer = this.layerMap_[layerId];
+  const layer = this.layersIndex_[layerId];
   layer.visible = !layer.visible;
 
   // Update hash.
@@ -164,7 +196,7 @@ LayerListControl.prototype.promoteLayerHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   const layerIndex = this.layers_.indexOf(thisLayer);
 
   // Range check.
@@ -205,7 +237,7 @@ LayerListControl.prototype.demoteLayerHandler_ = function (event) {
   const rowElement = button.parentElement;
   const layerElement = rowElement.parentElement;
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   const layerIndex = this.layers_.indexOf(thisLayer);
 
   // Range check.
@@ -262,7 +294,7 @@ LayerListControl.prototype.changeLayerOpacityHandler_ = function (event) {
   const layerElement = rowElement.parentElement;
   const opacityToggle = layerElement.querySelector(`.${this.CssClasses_.ItemAction_Opacity}`);
   const layerId = layerElement.getAttribute('data-layer-id');
-  const thisLayer = this.layerMap_[layerId];
+  const thisLayer = this.layersIndex_[layerId];
   // @range [1, 100]
   const inputValue = input.value;
   const opacityValue = inputValue * 0.01;
@@ -297,7 +329,7 @@ LayerListControl.prototype.reIndex_ = function () {
  * @param {Object} layer
  * @returns {HTMLElement}
  */
-LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
+LayerListControl.prototype.createLayerItemRowElement_ = function (layerAbstract) {
   const itemHideToggle = document.createElement('button');
   itemHideToggle.className = `${this.CssClasses_.ItemAction_Hide} material-icons`;
   itemHideToggle.title = 'Toggle layer visibility';
@@ -305,7 +337,7 @@ LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
 
   const itemLabel = document.createElement('label');
   itemLabel.className = `${this.CssClasses_.Item}__label`;
-  itemLabel.textContent = layer.title;
+  itemLabel.textContent = layerAbstract.title;
 
   const itemPromote = document.createElement('button');
   itemPromote.className = `${this.CssClasses_.ItemAction_Promote} material-icons`;
@@ -320,7 +352,7 @@ LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
   itemOpacityToggle.className = `${this.CssClasses_.ItemAction_Opacity} material-icons`;
   itemOpacityToggle.title = 'Toggle opacity slider';
   itemOpacityToggle.textContent = 'opacity';
-  itemOpacityToggle.style.opacity = layer.opacity;
+  itemOpacityToggle.style.opacity = layerAbstract.opacity;
 
   const itemRowMain = document.createElement('div');
   itemRowMain.className = this.CssClasses_.ItemRow;
@@ -340,7 +372,7 @@ LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
   itemRowOpacityInput.max = maxOpacity * 100;
   itemRowOpacityInput.min = minOpacity * 100;
   itemRowOpacityInput.step = 5;
-  itemRowOpacityInput.value = Math.floor(layer.opacity * 100);
+  itemRowOpacityInput.value = Math.floor(layerAbstract.opacity * 100);
 
   const itemRowOpacityValueLabel = document.createElement('label');
   itemRowOpacityValueLabel.className = `${this.CssClasses_.ItemRow}__value-label`;
@@ -354,12 +386,12 @@ LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
 
   const itemContainer = document.createElement('div');
   itemContainer.className = this.CssClasses_.Item;
-  if (!layer.visible) {
+  if (!layerAbstract.visible) {
     itemContainer.classList.add(this.CssClasses_.Item_Hidden);
   } else {
     itemContainer.classList.remove(this.CssClasses_.Item_Hidden);
   }
-  itemContainer.setAttribute('data-layer-id', layer.id);
+  itemContainer.setAttribute('data-layer-id', layerAbstract.id);
   itemContainer.appendChild(itemRowMain);
   itemContainer.appendChild(itemRowOpacity);
 
@@ -367,52 +399,42 @@ LayerListControl.prototype.createLayerItemRowElement_ = function (layer) {
 };
 
 /**
- * Reload everything in the list from the provided layer configs and extra configs.
- * @param {Array.<Object>} layerConfigs
- * @param {Object} extraLayerConfigs
+ * Reload everything in the list from the map layers.
  */
-LayerListControl.prototype.reload = function (layerConfigs, extraLayerConfigs) {
-  const container = this.layerListBody_;
+LayerListControl.prototype.reload_ = function () {
+  const layerCollection = this.map_.getLayerGroup().getLayers(),
+        container = this.layerListBody_;
 
   // Reset.
   while (container.lastChild) {
     container.removeChild(container.lastChild);
   }
   this.layers_.length = 0;
-  for (let key of Object.keys(this.layerMap_)) {
-    delete this.layerMap_[key];
+  for (let key of Object.keys(this.layersIndex_)) {
+    delete this.layersIndex_[key];
   }
 
-  // Load layers into internal data structure.
-  layerConfigs.forEach((config, index) => {
-    const layerId = config.id;
-    const newLayer = {
+  layerCollection.forEach((layer, index) => {
+    const layerId = layer.get('id');
+
+    const layerAbstract = {
       "index": index,
       "id": layerId,
-      "title": config.title,
-      "zIndex": config.zIndex,
-      "visible": config.visible,
-      "opacity": config.opacity
+      "title": layer.get('title'),
+      "zIndex": layer.get('zIndex'),
+      "visible": layer.get('visible'),
+      "opacity": layer.get('opacity')
     };
 
-    if (extraLayerConfigs.hasOwnProperty(layerId)) {
-      const extraConfig = extraLayerConfigs[layerId];
-      for (let propName of ['zIndex', 'visible', 'opacity']) {
-        if (extraConfig.hasOwnProperty(propName)) {
-          newLayer[propName] = extraConfig[propName];
-        }
-      }
-    }
-
-    this.layers_.push(newLayer);
-    this.layerMap_[layerId] = newLayer;
+    this.layers_.push(layerAbstract);
+    this.layersIndex_[layerId] = layerAbstract;
   });
 
   this.sortLayers_();
 
   // Build DOM.
-  this.layers_.forEach((layer) => {
-    container.appendChild(this.createLayerItemRowElement_(layer));
+  this.layers_.forEach((layerAbstract) => {
+    container.appendChild(this.createLayerItemRowElement_(layerAbstract));
   });
 };
 
@@ -461,8 +483,8 @@ LayerListControl.prototype.update = function (extraLayerConfigs) {
         $listItems.detach().sort((a, b) => {
           const layerIdA = a.getAttribute('data-layer-id'),
                 layerIdB = b.getAttribute('data-layer-id');
-          const layerA = this.layerMap_[layerIdA],
-                layerB = this.layerMap_[layerIdB];
+          const layerA = this.layersIndex_[layerIdA],
+                layerB = this.layersIndex_[layerIdB];
           return this.compareLayerOrder_(layerA, layerB);
         })
     );
@@ -474,7 +496,7 @@ LayerListControl.prototype.update = function (extraLayerConfigs) {
     const layerRowElement = this;
 
     const layerId = layerRowElement.getAttribute('data-layer-id');
-    const layer = this_.layerMap_[layerId];
+    const layer = this_.layersIndex_[layerId];
 
     if (!layer.visible) {
       layerRowElement.classList.add(this_.CssClasses_.Item_Hidden);

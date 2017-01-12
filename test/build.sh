@@ -7,8 +7,8 @@ ROOT="$TEST/.."
 
 npm run build
 
-BUILTLIB="lib/viewer.js"
-TESTLIB="test/www/viewer.js"
+BUILTLIB="lib/app.js"
+TESTLIB="test/www/app.js"
 
 # Copy the built file to www.
 cp "$ROOT/$BUILTLIB" "$ROOT/$TESTLIB"
