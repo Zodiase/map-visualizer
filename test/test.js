@@ -260,18 +260,29 @@ describe('source loading', function(){
                 browser.click(layerListToggleButtonQuery);
             });
 
-            it.skip('should see the correct layer order when config string include the order', function(){
+            it('should see the correct layer order when config string include the order', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
-                browser.waitForExist('.layer-list__item');
+
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
+                browser.pause(1000);
+
                 var row1_label = browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id');
                 var row2_label = browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id');
-                var location_hash = "http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.1_-_osm___1_1_0.1";
-                browser.url(location_hash);
-                browser.waitForExist('.layer-list__item');
+                browser.url("http://localhost:4000/#source=https%3A%2F%2Fraw.githubusercontent.com%2FZodiase%2Fmap-visualizer%2Fgh-pages%2Fsample-source%2Ftwo-layers.json&config=mapquest___0_1_0.1_-_osm___1_1_0.1");
+                browser.waitForExist(layerListToggleButtonQuery);
+
                 var new_row1_label = browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id');
                 var new_row2_label = browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id');
                 expect(row1_label).to.equal(new_row2_label);
                 expect(row2_label).to.equal(new_row1_label);
+
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
             //case when giving an invalid number as order
         });
