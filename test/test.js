@@ -1,4 +1,4 @@
-describe.skip('simple test', function(){
+describe('simple test', function(){
 
     before('set up url', function(){
         browser.url('/');
@@ -57,7 +57,7 @@ describe.skip('simple test', function(){
 
 describe('source loading', function(){
 
-    describe.skip('source file', function(){
+    describe('source file', function(){
 
         describe('url', function(){
 
@@ -105,7 +105,7 @@ describe('source loading', function(){
 
     describe('config string', function(){
 
-        describe.skip('opacity test', function(){
+        describe('opacity test', function(){
 
             it('should change config string when opacity silder changed by user', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
