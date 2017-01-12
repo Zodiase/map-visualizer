@@ -173,36 +173,35 @@ describe('source loading', function(){
 
             it('should change the layer order in list when user click arrow', function(){
                 browser.reseturl("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/two-layers.json");
-                browser.waitForExist('.layer-list__toggle button');
-                var button = '.layer-list__toggle button';
-                browser.click(button);
-                browser.saveScreenshot('after toggle');
+
+                // Wait for layer list to be ready.
+                var layerListToggleButtonQuery = '.layer-list__toggle button';
+                browser.waitForExist(layerListToggleButtonQuery);
+
+                // Expand the layer list.
+                browser.click(layerListToggleButtonQuery);
 
                 var row1 = '.layer-list__item:nth-child(1) .layer-list__item-row';
-                var row1_up = row1 + ' .layer-list__item__action-promote';
                 browser.waitForExist(row1);
+
+                var row1_up = row1 + ' .layer-list__item__action-promote';
                 var original_label = browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id');
-                browser.saveScreenshot('before click');
                 browser.moveToObject(row1).moveToObject(row1_up).click(row1_up);
-                //browser.waitForVisible(row1_up, 5000);
-                //browser.click(row1_up);
                 expect(browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id')).to.equal(original_label);
 
-                var second_label = browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id');
                 var row1_down = row1 + ' .layer-list__item__action-demote';
-                var original_label = browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id');
-                browser.click(row1_down);
+                var second_label = browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id');
+                browser.moveToObject(row1).moveToObject(row1_down).click(row1_down);
                 expect(browser.getAttribute('.layer-list__item:nth-child(1)', 'data-layer-id')).to.equal(second_label);
 
                 var row2 = '.layer-list__item:nth-child(2) .layer-list__item-row';
                 var original_label2 = browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id');
                 var row2_down = row2 + ' .layer-list__item__action-demote';
-                browser.moveToObject(row2);
-                browser.waitForVisible(row2_down, 5000);
-                browser.click(row2_down);
+                browser.moveToObject(row2).moveToObject(row2_down).click(row2_down);
                 expect(browser.getAttribute('.layer-list__item:nth-child(2)', 'data-layer-id')).to.equal(original_label2);
-                browser.click(button);
 
+                // Collapse the layer list.
+                browser.click(layerListToggleButtonQuery);
             });
 
             it.skip('should change the config string when layer order changed', function(){
