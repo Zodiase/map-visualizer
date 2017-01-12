@@ -363,11 +363,19 @@ describe('source loading', function(){
         });
 
     });
-    describe.skip('extent string', function(){
+
+    describe('extent string', function(){
+
+        before(function(){
+            browser.url('/');
+        });
+
         it('should follow extent set by url if any', function(){
-            var location_hash = "/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/tiled-arcgis.json&extent=-100_15_-40_50";
-            browser.url(location_hash);
-            browser.pause(1000); // to be deleted?
+            browser.url("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/tiled-arcgis.json&extent=-100_15_-40_50");
+
+            // Wait for the downloading to be done.
+            browser.pause(1000);
+
             var extUrl = [-100, 15, -40, 50];
             var absCenter = [(extUrl[0]+extUrl[2])/2, (extUrl[1]+extUrl[3])/2];
             var browserExtent = browser.execute(function() {
@@ -386,9 +394,11 @@ describe('source loading', function(){
         });
 
         it('should switch back to extent setting in src file if delete extent from url', function(){
-            var location_hash = "/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/tiled-arcgis.json";
-            browser.url(location_hash);
-            browser.pause(1000); // to be deleted?
+            browser.url("/#source=https://raw.githubusercontent.com/Zodiase/map-visualizer/gh-pages/sample-source/tiled-arcgis.json");
+
+            // Wait for the downloading to be done.
+            browser.pause(1000);
+
             var extUrl = [-129.19921874999997, 20.9203969139719, -62.402343749999986, 52.829320910313726];
             var absCenter = [(extUrl[0]+extUrl[2])/2, (extUrl[1]+extUrl[3])/2];
             var browserExtent = browser.execute(function() {
