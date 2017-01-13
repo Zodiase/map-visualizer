@@ -12,13 +12,6 @@ describe('simple test', function(){
 
     describe('Check homepage when first loaded', function(){
 
-        it('should see the correct title', function() {
-
-            var title = browser.getTitle();
-            expect(title).to.equal('Visualize');
-
-        });
-
         it('should have map with the size same as viewport', function(){
             var viewportHeight = browser.getViewportSize('height');
             var viewportWidth = browser.getViewportSize('width');
