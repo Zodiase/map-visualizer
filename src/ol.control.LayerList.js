@@ -1,3 +1,7 @@
+/*global document*/
+
+import $ from 'jquery';
+
 import {
   maxOpacity,
   minOpacity

@@ -1,3 +1,7 @@
+/*global document*/
+
+import $ from 'jquery';
+
 // Layer List Control constructor.
 export const OverlayControl = function (opt_options) {
   const options = opt_options || {};

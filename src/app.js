@@ -1,3 +1,8 @@
+/*global window, location*/
+
+import $ from 'jquery';
+import _ from 'lodash';
+
 import {
   DefaultProjection,
   extentUpdateDelay
@@ -38,46 +43,47 @@ class App {
    * @param {string} options.mapContainerSelector
    */
   constructor ({mapContainerSelector}) {
-    this.$mapContainer_ = $(mapContainerSelector);
-    if (this.$mapContainer_.length === 0) {
-      throw new ReferenceError('Can not find elements.');
+    const mapContainer = $(mapContainerSelector)[0];
+    if (!mapContainer) {
+      throw new ReferenceError('Can not find map container.');
     }
 
     this.overlay_ = new OverlayControl();
 
     this.viewer_ = new Viewer({
-      target: this.$mapContainer_[0],
+      target: mapContainer,
       controls: [
         this.overlay_
       ]
     });
 
-    // Runtime data.
+    // # Runtime data.
+    this.state_ = new Map();
+
     /**
      * If true, the app is busy processing a hash change.
      * @type {Boolean}
      */
-    this.busy_ = false;
+    this.state_.set('busy', false);
+
     /**
      * If true, the app has successfully loaded a valid source file.
      * @type {Boolean}
      */
-    this.loaded_ = false;
+    this.state_.set('sourceLoaded', false);
+
     /**
-     * If loaded is true, this is the url of the loaded source file.
+     * If a valid source file has been loaded, this is the url of the loaded source file.
      * @type {String|null}
      */
-    this.loadedSourceUrl_ = null;
+    this.state_.set('loadedSourceUrl', null);
+
     /**
-     * If loaded is true, this is the data of the loaded source file.
+     * If a valid source file has been loaded, this is the data of the loaded source file.
      * @type {Object|null}
      */
-    this.loadedSourceData_ = null;
-    /**
-     * Stores the ID of the timer that is used to update the extent config in the url.
-     * @type {Number|null}
-     */
-    this.extentUpdateTimer_ = null;
+    this.state_.set('loadedSourceData', null);
+
     /**
      * Stores the last fitted stable map view extent.
      * @type {Array.<Number>|null}
@@ -86,6 +92,9 @@ class App {
 
     this.boundUserInteractionStart_ = this.userInteractionStart_.bind(this);
     this.boundUserInteractionEnd_ = this.userInteractionEnd_.bind(this);
+    this.boundSetHashViewExtent_ = this.setHashViewExtent.bind(this);
+
+    this.debouncedSetHashViewExtent_ = _.debounce(this.boundSetHashViewExtent_, extentUpdateDelay);
 
     this.viewer_.on('change:center', this.boundUserInteractionStart_);
     this.viewer_.on('change:resolution', this.boundUserInteractionStart_);
@@ -95,10 +104,7 @@ class App {
 
   // Cancel any pending extent updates.
   cancelPendingExtentUpdates_ () {
-    if (this.extentUpdateTimer_ !== null) {
-      window.clearTimeout(this.extentUpdateTimer_);
-      this.extentUpdateTimer_ = null;
-    }
+    this.debouncedSetHashViewExtent_.cancel();
   }
 
   /**
@@ -106,55 +112,71 @@ class App {
    * @param {String} hash
    */
   startWithHash (hash) {
-    // The app should not be busy while processing a new hash.
-    if (this.busy_) {
+    // The app should not handle a new hash while busy.
+    if (this.state_.get('busy')) {
       warn('Hash update while busy!');
       location.reload();
       return;
     }
-    this.busy_ = true;
+    this.state_.set('busy', true);
 
     // Cancel any extent updates.
     this.cancelPendingExtentUpdates_();
 
     info('Hash', hash);
+
     const parse = parseHashString(hash);
     info('parse', parse);
+
     const sourceUrl = (parse.source || '').trim();
     info('sourceUrl', sourceUrl);
-    const extra = {};
-    const configString = (parse.config || '').trim();
-    // Config String is optional.
-    extra.layerConfigs = parseLayerConfigString(configString);
+
+    // Config String and Extent String are optional.
+    const configString = (parse.config || '').trim(),
+          extentString = (parse.extent || '').trim();
+
+    const extra = {
+      layerConfigs: parseLayerConfigString(configString),
+      extent: parseExtentString(extentString)
+    };
     info('extra.layerConfigs', extra.layerConfigs);
-    const extentString = (parse.extent || '').trim();
-    // Extent String is optional.
-    extra.extent = parseExtentString(extentString);
     info('extra.extent', extra.extent);
 
-    if (this.loaded_ && sourceUrl === this.loadedSourceUrl_) {
+    if (this.state_.get('sourceLoaded') && sourceUrl === this.state_.get('loadedSourceUrl')) {
       // Source Url didn't change.
+
       log('Updating...');
+
       // Update layers.
       this.viewer_.updateLayers(extra.layerConfigs);
+
       // Update map view extent.
-      const newExtent = (extra.extent !== null) ? extra.extent : this.loadedSourceData_.extent;
+      const newExtent = (extra.extent !== null) ? extra.extent : this.state_.get('loadedSourceData').extent;
       if (!isIdenticalExtent(this.fitExtent_, newExtent)) {
         this.fitExtent_ = this.viewer_.setExtent(newExtent);
       }
 
       log('Updated');
-      this.busy_ = false;
+
+      this.state_.set('busy', false);
+
     } else {
+      // Start with new source.
+
       log('Loading new...');
-      // Some resetting here.
-      this.loaded_ = false;
-      this.loadedSourceUrl_ = null;
-      this.loadedSourceData_ = null;
-      this.fitExtent_ = null;
+
+      // Reset loading state.
+      this.state_.set('sourceLoaded', false);
+      this.state_.set('loadedSourceUrl', null);
+      this.state_.set('loadedSourceData', null);
+
+      // Reset viewer.
       this.viewer_.setLayers([]);
-      this.overlay_.empty();
       this.viewer_.setMapProjection(null);
+
+      // Reset other app stuff.
+      this.fitExtent_ = null;
+      this.overlay_.empty();
 
       this.overlay_.append(
         $('<div class="hashparse">')
@@ -162,15 +184,20 @@ class App {
         .append($('<div>').text(`config: ${JSON.stringify(extra.layerConfigs)}`))
         .append($('<div>').text(`extent: ${JSON.stringify(extra.extent)}`))
       );
-      // Source Url is necessary.
+
+      // Source Url is required.
       if (sourceUrl.length === 0) {
         // No source url available.
         warn('No source url available.');
         this.overlay_.appendText('No source url available.');
         return;
       }
+
       log('Downloading source file...');
       this.overlay_.appendText('Downloading source file...');
+
+      //! Emit `source-before-download`, along with `sourceUrl`.
+
       $.getJSON(sourceUrl)
       .fail((jqxhr, textStatus, err) => {
         const errStr = `${textStatus}, ${err}`;
@@ -179,7 +206,10 @@ class App {
       })
       .done((data) => {
         info('Downloaded', data);
+
+        // Clear overlay info to clear the view of the map.
         this.overlay_.empty();
+
         try {
           // Load projection from source file or use default.
           this.viewer_.setMapProjection(data.projection || DefaultProjection);
@@ -189,15 +219,17 @@ class App {
           // Load layers.
           this.viewer_.setLayers(data.layers, extra.layerConfigs);
 
-          this.loaded_ = true;
-          this.loadedSourceUrl_ = sourceUrl;
-          this.loadedSourceData_ = data;
+          this.state_.set('sourceLoaded', true);
+          this.state_.set('loadedSourceUrl', sourceUrl);
+          this.state_.set('loadedSourceData', data);
+
           log('Loaded');
         } catch (err) {
           error(err);
           this.overlay_.appendText(err);
         }
-        this.busy_ = false;
+
+        this.state_.set('busy', false);
       });
     }
   }
@@ -214,11 +246,9 @@ class App {
    */
   userInteractionEnd_ () {
     // If not loaded, ignore these events.
-    if (!this.loaded_) {
+    if (!this.state_.get('sourceLoaded')) {
       return;
     }
-
-    this.cancelPendingExtentUpdates_();
 
     const viewExtent = this.viewer_.getExtent();
 
@@ -229,7 +259,7 @@ class App {
 
     this.fitExtent_ = viewExtent;
 
-    this.extentUpdateTimer_ = window.setTimeout(this.setHashViewExtent.bind(this, viewExtent), extentUpdateDelay);
+    this.debouncedSetHashViewExtent_(viewExtent);
   }
 
   /**
@@ -238,10 +268,8 @@ class App {
    * @param {Array.<Number>} extent
    */
   setHashViewExtent (extent) {
-    this.extentUpdateTimer_ = null;
-
     // If not loaded, do nothing.
-    if (!this.loaded_) {
+    if (!this.state_.get('sourceLoaded')) {
       return;
     }
 

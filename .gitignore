@@ -2,3 +2,8 @@ node_modules
 errorShots
 selenium.jar
 test/www
+
+!test/www/index.html
+!test/www/index.css
+src-babelfree
+lib

@@ -1,3 +1,5 @@
+/*global location*/
+
 /**
  * Parse a location hash string and return key-value pairs.
  * The input hash string can optionally have a leading `#`.

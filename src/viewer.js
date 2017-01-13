@@ -1,3 +1,5 @@
+import $ from 'jquery';
+
 import {
   getLayerFromConfig
 } from './layerSourceMapping.js';
