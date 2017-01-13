@@ -281,6 +281,8 @@ class Viewer {
   /**
    * Make the current view fit to the given extent.
    * Returns the new extent in effect.
+   * @param {ol.Extent} newExtent
+   * @return {ol.Extent}
    */
   setExtent (newExtent) {
     this.map_.getView().fit(newExtent, this.map_.getSize());
@@ -289,13 +291,17 @@ class Viewer {
 
   /**
    * Return the current extent of the current view.
+   * @return {ol.Extent}
    */
   getExtent () {
     return this.map_.getView().calculateExtent(this.map_.getSize());
   }
 
 }
+
+// Set of standardized APIs for managing events on different targets.
 Viewer.prototype.eventMapping_ = {
+  // Default mapping target: the DOM element.
   '': {
     trigger (eventType, extraParameters) {
       return this.element_.triggerHandler(this.encodeEventType_(eventType), extraParameters);
@@ -310,6 +316,7 @@ Viewer.prototype.eventMapping_ = {
       return this.element_.off(this.encodeEventType_(eventType), callback);
     }
   },
+  // ol.Map as the target.
   'map': {
     trigger (eventType, extraParameters) {
       // For openlayers there is no way to send extra parameters to the event handler so `extraParameters` is discarded.
