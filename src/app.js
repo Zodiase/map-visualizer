@@ -96,7 +96,7 @@ class App {
      * Stores the last fitted stable map view extent.
      * @type {Array.<Number>|null}
      */
-    this.fitExtent_ = null;
+    this.state_.set('currentFitExtent', null);
 
     this.boundUserInteractionStart_ = this.userInteractionStart_.bind(this);
     this.boundUserInteractionEnd_ = this.userInteractionEnd_.bind(this);
@@ -160,8 +160,9 @@ class App {
 
       // Update map view extent.
       const newExtent = (extra.extent !== null) ? extra.extent : this.state_.get('loadedSourceData').extent;
-      if (!isIdenticalExtent(this.fitExtent_, newExtent)) {
-        this.fitExtent_ = this.viewer_.setExtent(newExtent);
+      if (!isIdenticalExtent(this.state_.get('currentFitExtent'), newExtent)) {
+        const newFitExtent = this.viewer_.setExtent(newExtent);
+        this.state_.set('currentFitExtent', newFitExtent);
       }
 
       log('Updated');
@@ -183,7 +184,7 @@ class App {
       this.viewer_.setMapProjection(null);
 
       // Reset other app stuff.
-      this.fitExtent_ = null;
+      this.state_.set('currentFitExtent', null);
       this.overlay_.empty();
 
       this.overlay_.append(
@@ -222,8 +223,9 @@ class App {
           // Load projection from source file or use default.
           this.viewer_.setMapProjection(data.projection || DefaultProjection);
           // Update map view extent.
-          const newExtent = (extra.extent !== null) ? extra.extent : data.extent;
-          this.fitExtent_ = this.viewer_.setExtent(newExtent);
+          const newExtent = (extra.extent !== null) ? extra.extent : data.extent,
+                newFitExtent = this.viewer_.setExtent(newExtent);
+          this.state_.set('currentFitExtent', newFitExtent);
           // Load layers.
           this.viewer_.setLayers(data.layers, extra.layerConfigs);
 
@@ -261,11 +263,11 @@ class App {
     const viewExtent = this.viewer_.getExtent();
 
     // Check if need to update extent.
-    if (isIdenticalExtent(this.fitExtent_, viewExtent)) {
+    if (isIdenticalExtent(this.state_.get('currentFitExtent'), viewExtent)) {
       return;
     }
 
-    this.fitExtent_ = viewExtent;
+    this.state_.set('currentFitExtent', viewExtent);
 
     this.debouncedSetHashViewExtent_(viewExtent);
   }
