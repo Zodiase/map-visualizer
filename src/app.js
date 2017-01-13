@@ -1,4 +1,4 @@
-/*global window, location*/
+/*global window*/
 
 import $ from 'jquery';
 import _ from 'lodash';
@@ -115,7 +115,7 @@ class App {
     // The app should not handle a new hash while busy.
     if (this.state_.get('busy')) {
       warn('Hash update while busy!');
-      location.reload();
+      window.location.reload();
       return;
     }
     this.state_.set('busy', true);
@@ -286,10 +286,10 @@ const app = new App({
 });
 
 $(window).on('load', () => {
-  app.startWithHash(location.hash);
+  app.startWithHash(window.location.hash);
   $(window).on('hashchange', () => {
     // Need to check if Source Url has been changed.
-    app.startWithHash(location.hash);
+    app.startWithHash(window.location.hash);
   });
 });
 
