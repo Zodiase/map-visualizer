@@ -3,6 +3,11 @@
 import $ from 'jquery';
 import _ from 'lodash';
 
+const {
+  name: appName,
+  version: appVersion
+} = require('../package.json');
+
 import {
   DefaultProjection,
   extentUpdateDelay
@@ -47,6 +52,9 @@ class App {
     if (!mapContainer) {
       throw new ReferenceError('Can not find map container.');
     }
+
+    this.name = appName;
+    this.version = appVersion;
 
     this.overlay_ = new OverlayControl();
 
@@ -286,11 +294,16 @@ const app = new App({
 });
 
 $(window).on('load', () => {
+
+  window.document.title = `${appName} @${appVersion}`;
+
   app.startWithHash(window.location.hash);
+
   $(window).on('hashchange', () => {
     // Need to check if Source Url has been changed.
     app.startWithHash(window.location.hash);
   });
+
 });
 
 window.__app = app;

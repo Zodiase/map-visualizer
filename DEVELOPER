@@ -38,7 +38,7 @@
 | resolving those `require` expressions. Browserify is used for bundling and   |
 | `require` expression support.                                                |
 |                                                                              |
-| When building, transpiled code is saved at ./lib/src/ and will then be       |
+| When building, transpiled code is saved at ./src-babelfree/ and will then be |
 | bundled into ./lib/viewer.js.                                                |
 |                                                                              |
 +------------------------------------------------------------------------------+
