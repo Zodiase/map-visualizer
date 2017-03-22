@@ -10,7 +10,7 @@
         "type": "GeoJSON",
         "options": {
           "jsonFile": {
-            "url": "./sample-source/custom.geo.json"
+            "url": "./sample-source/data/custom.geo.json"
           }
         }
       }
