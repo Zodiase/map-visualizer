@@ -5,7 +5,7 @@
       "title": "GeoJSON",
       "zIndex": 10,
       "visible": true,
-      "opacity": 1,
+      "opacity": 0.3,
       "source": {
         "type": "GeoJSON",
         "options": {
@@ -20,25 +20,12 @@
       "title": "Open Street Map",
       "zIndex": 0,
       "visible": true,
-      "opacity": 0.1,
+      "opacity": 1,
       "source": {
         "type": "OSM",
         "options": {}
       }
-    },
-    {
-      "id": "mapquest",
-      "title": "MapQuest",
-      "zIndex": 0,
-      "visible": true,
-      "opacity": 0.1,
-      "source": {
-        "type": "MapQuest",
-        "options": {
-          "layer": "sat"
-        }
-      }
     }
   ],
-  "extent": [-179.89999996667328, -85.05999999689446, 179.89999996667328, 85.05999999689448]
+  "extent": [-207.94921875, -2.8125, -37.79296875, 69.2578125]
 }
