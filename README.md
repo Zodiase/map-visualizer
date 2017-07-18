@@ -1,5 +1,7 @@
 # Map Visualizer
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Zodiase/map-visualizer.svg)](https://greenkeeper.io/)
+
 Implemented with [OpenLayers 3](http://openlayers.org/), the Map Visualizer can load a flat list of layers and let the user configure each layer and share the visual results with other users.
 
 Visit the app at: [zodiase.github.io/map-visualizer](http://zodiase.github.io/map-visualizer/)
